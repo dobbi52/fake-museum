@@ -1,0 +1,713 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#1d2a44">
+<title>도비의 미술관 — 가짜를 찾아라</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&family=Noto+Serif+KR:wght@600;700;900&display=swap" rel="stylesheet">
+<style>
+:root{--navy:#1d2a44;--navy2:#2b3b5e;--red:#c0392b;--gold:#b88a2e;--paper:#f7f3ea;--card:#fffdf8;--ink:#22252b;--mute:#7a7f88;--line:#e2ddd2;--ok:#2e8b57}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%}
+body{font-family:'Noto Sans KR',sans-serif;background:var(--paper);color:var(--ink);overscroll-behavior:none;user-select:none;-webkit-user-select:none}
+.serif{font-family:'Noto Serif KR',serif}
+button{font-family:inherit;cursor:pointer;border:none}
+input{font-family:inherit}
+#top{position:sticky;top:0;z-index:20;background:var(--navy);color:#fff;display:flex;align-items:center;justify-content:space-between;padding:10px 14px;gap:10px}
+#secret{position:fixed;left:0;top:0;width:60px;height:60px;z-index:50}
+#brand{font-size:14px;letter-spacing:.08em;opacity:.9;white-space:nowrap}
+#brand b{font-family:'Noto Serif KR',serif;letter-spacing:0;font-size:16px;opacity:1}
+#stat{display:flex;align-items:center;gap:12px;font-weight:700}
+#timer{font-variant-numeric:tabular-nums;font-size:20px;letter-spacing:.04em}
+#timer.over{color:#ff8a80}
+#hearts{font-size:18px;letter-spacing:2px;color:#ff8a80;min-width:20px}
+#snd{background:transparent;color:#fff;font-size:18px;opacity:.8}
+#keys{display:flex;gap:4px}
+#keys span{width:22px;height:22px;border:1.5px solid rgba(255,255,255,.5);border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700}
+#keys span.on{background:#fff;color:var(--red);border-color:#fff}
+main{max-width:760px;margin:0 auto;padding:18px 16px 60px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:22px 20px;box-shadow:0 2px 0 rgba(0,0,0,.03)}
+.eyebrow{font-size:12px;letter-spacing:.18em;color:var(--mute);font-weight:700}
+.stamp{display:inline-block;border:2px solid var(--red);color:var(--red);font-weight:900;font-size:13px;padding:2px 9px;letter-spacing:.1em;transform:rotate(-3deg);border-radius:3px}
+.stamp.gold{border-color:var(--gold);color:var(--gold)}
+h1{font-size:30px;line-height:1.25;color:var(--navy);word-break:keep-all}
+h2{font-size:24px;line-height:1.3;color:var(--navy);word-break:keep-all}
+p.lead{font-size:17px;line-height:1.75;word-break:keep-all;margin-top:12px}
+.muted{color:var(--mute)}
+.btn{display:block;width:100%;background:var(--navy);color:#fff;font-size:18px;font-weight:700;padding:16px;border-radius:12px;margin-top:18px;transition:transform .1s}
+.btn:active{transform:scale(.98)}
+.btn.red{background:var(--red)}
+.btn.gold{background:var(--gold)}
+.btn.ghost{background:transparent;color:var(--navy);border:2px solid var(--navy)}
+.btn:disabled{opacity:.35}
+.row{display:flex;gap:10px}
+.row .btn{margin-top:12px}
+.hint-row{display:flex;gap:8px;margin-top:14px}
+.hint-row button{flex:1;background:#fff;border:1.5px dashed var(--gold);color:var(--gold);font-weight:700;padding:10px;border-radius:10px;font-size:14px}
+.hint-row button:disabled{opacity:.35}
+.hintbox{margin-top:12px;background:#fbf4e3;border-left:4px solid var(--gold);padding:12px 14px;border-radius:6px;font-size:15px;line-height:1.6;word-break:keep-all}
+.teams{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:16px}
+.teams button{background:#fff;border:2px solid var(--line);border-radius:12px;padding:16px 0;font-size:22px;font-weight:900;color:var(--navy)}
+.teams button.sel{background:var(--navy);color:#fff;border-color:var(--navy)}
+.steps{display:flex;gap:6px;margin:4px 0 14px}
+.steps i{flex:1;height:5px;border-radius:3px;background:var(--line)}
+.steps i.on{background:var(--red)}
+.steps i.done{background:var(--navy)}
+.q{font-size:20px;font-weight:700;line-height:1.5;word-break:keep-all;margin-top:10px}
+.opts{display:flex;flex-direction:column;gap:10px;margin-top:16px}
+.opts button{background:#fff;border:2px solid var(--line);border-radius:12px;padding:14px 16px;font-size:17px;text-align:left;display:flex;gap:12px;align-items:center;line-height:1.45;word-break:keep-all;color:var(--ink);transition:opacity .3s,transform .3s}
+.opts button b{flex:0 0 30px;height:30px;border-radius:50%;background:var(--paper);display:flex;align-items:center;justify-content:center;color:var(--navy)}
+.opts button.gone{opacity:0;transform:scale(.9);pointer-events:none;height:0;padding:0;margin:-5px 0;border:0;overflow:hidden}
+.opts button.right{border-color:var(--ok);background:#eaf6ef}
+.inp{display:flex;gap:10px;margin-top:16px}
+.inp input{flex:1;font-size:22px;padding:14px;border:2px solid var(--line);border-radius:12px;text-align:center;font-weight:700;color:var(--navy);min-width:0}
+.inp input:focus{outline:none;border-color:var(--navy)}
+.inp button{background:var(--navy);color:#fff;font-weight:700;font-size:17px;border-radius:12px;padding:0 20px}
+.digits{display:flex;gap:10px;justify-content:center;margin-top:18px}
+.digits input{width:62px;height:72px;font-size:34px;text-align:center;border:2.5px solid var(--navy);border-radius:10px;font-weight:900;color:var(--navy)}
+.file{background:#f3efe4;border:1px solid var(--line);border-radius:10px;padding:16px;margin-top:14px;font-size:16px;line-height:1.8;word-break:keep-all;position:relative}
+.file.loc:before{display:none}
+.file:before{content:'감정 파일';position:absolute;top:-10px;left:12px;background:var(--gold);color:#fff;font-size:11px;font-weight:700;padding:2px 8px;border-radius:4px;letter-spacing:.1em}
+.spotwrap{position:relative;margin-top:14px;border-radius:6px;overflow:hidden;touch-action:manipulation;background:#000}
+.spotwrap img{display:block;width:100%;height:auto}
+.mark{position:absolute;border:4px solid var(--red);border-radius:50%;transform:translate(-50%,-50%);pointer-events:none;box-shadow:0 0 0 2px #fff;animation:pop .35s ease-out}
+.mark.hint{border-color:var(--gold);border-style:dashed;box-shadow:none;animation:blink 1s infinite}
+.xmark{position:absolute;transform:translate(-50%,-50%);color:#fff;font-size:34px;font-weight:900;text-shadow:0 0 6px #000;pointer-events:none;animation:fade 1s forwards}
+@keyframes pop{from{transform:translate(-50%,-50%) scale(1.6);opacity:0}to{transform:translate(-50%,-50%) scale(1);opacity:1}}
+@keyframes fade{0%{opacity:1}100%{opacity:0;transform:translate(-50%,-80%)}}
+@keyframes blink{50%{opacity:.3}}
+.found{display:flex;gap:8px;justify-content:center;margin-top:12px;font-size:15px;align-items:center}
+.found i{width:26px;height:26px;border-radius:50%;border:2.5px solid var(--line);display:inline-block}
+.found i.on{background:var(--red);border-color:var(--red)}
+.restore{position:relative;margin-top:14px;border-radius:6px;overflow:hidden}
+.restore img{display:block;width:100%}
+.restore img.top{position:absolute;inset:0;transition:opacity 2.4s ease}
+.keycard{text-align:center;margin-top:18px}
+.keyletter{display:inline-flex;width:96px;height:96px;border:4px solid var(--red);border-radius:12px;align-items:center;justify-content:center;font-size:54px;font-weight:900;color:var(--red);font-family:'Noto Serif KR',serif;background:#fff;animation:pop2 .6s}
+@keyframes pop2{0%{transform:scale(0) rotate(-20deg)}70%{transform:scale(1.15)}100%{transform:scale(1)}}
+.clue{margin-top:16px;background:#fdecea;border:1.5px solid #f2b8b0;border-radius:10px;padding:14px;font-size:16px;line-height:1.7;text-align:left;word-break:keep-all}
+.clue b{color:var(--red)}
+.map{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:16px}
+.map div{border:2px solid var(--line);border-radius:12px;padding:12px;background:#fff}
+.map div.done{background:#eef1f7;border-color:#cfd6e4}
+.map div.next{border-color:var(--red);box-shadow:0 0 0 3px #fbe1de}
+.map small{font-size:11px;letter-spacing:.12em;color:var(--mute);font-weight:700}
+.map b{display:block;font-size:17px;color:var(--navy);margin-top:2px}
+.map span{font-size:13px;color:var(--mute)}
+.tiles{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-top:16px}
+.tiles button{width:62px;height:62px;font-size:28px;font-weight:900;font-family:'Noto Serif KR',serif;background:#fff;border:2.5px solid var(--navy);border-radius:10px;color:var(--navy)}
+.tiles button.used{opacity:.2;pointer-events:none}
+.slots{display:flex;gap:6px;justify-content:center;margin-top:14px;flex-wrap:wrap}
+.slots span{width:48px;height:56px;border:2.5px solid var(--red);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:26px;font-weight:900;color:var(--red);background:#fff;font-family:'Noto Serif KR',serif}
+.sus{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}
+.sus button{background:#fff;border:2px solid var(--line);border-radius:12px;padding:14px;text-align:left;color:var(--ink)}
+.sus button b{display:block;font-size:19px;color:var(--navy)}
+.sus button span{font-size:13px;color:var(--mute);line-height:1.6;display:block;margin-top:4px}
+.sus button.gone{opacity:.3;pointer-events:none;text-decoration:line-through}
+.cluelist{margin-top:12px;display:flex;flex-direction:column;gap:6px}
+.cluelist div{font-size:14px;line-height:1.55;background:#fff;border:1px solid var(--line);border-radius:8px;padding:8px 10px;word-break:keep-all}
+.cert{background:#fff;border:6px double var(--gold);border-radius:6px;padding:28px 20px;text-align:center}
+.cert h1{font-size:28px}
+.cert .stars{font-size:40px;color:var(--gold);letter-spacing:6px;margin:10px 0}
+.cert table{margin:16px auto 0;border-collapse:collapse;font-size:16px}
+.cert td{padding:6px 14px;border-bottom:1px solid var(--line)}
+.cert td:first-child{color:var(--mute)}
+.modal{position:fixed;inset:0;background:rgba(15,20,35,.72);z-index:60;display:flex;align-items:center;justify-content:center;padding:20px}
+.modal .card{max-width:520px;width:100%;max-height:90vh;overflow:auto}
+.toast{position:fixed;left:50%;bottom:30px;transform:translateX(-50%);background:var(--navy);color:#fff;padding:12px 20px;border-radius:30px;font-weight:700;z-index:70;font-size:16px;animation:fade 2.2s forwards;animation-delay:0s}
+.shake{animation:shake .4s}
+@keyframes shake{20%,60%{transform:translateX(-8px)}40%,80%{transform:translateX(8px)}}
+.tset{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--line);font-size:15px;gap:10px}
+.tset select,.tset input{font-size:15px;padding:6px;border-radius:6px;border:1px solid var(--line)}
+.tbtn{background:var(--paper);border:1px solid var(--line);border-radius:8px;padding:10px;font-size:14px;margin-top:8px;width:100%;font-weight:700;color:var(--navy)}
+.tbtn.danger{color:var(--red);border-color:#f2b8b0}
+.ans{font-size:13px;line-height:1.7;margin-top:10px}
+.ans h4{margin-top:10px;color:var(--navy)}
+.feel-q{font-size:21px;font-weight:700;color:var(--navy);text-align:center;line-height:1.5;margin:22px 0 6px;word-break:keep-all}
+.suspects-info{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}
+.suspects-info div{background:#fff;border:1px solid var(--line);border-radius:10px;padding:10px;font-size:13px;line-height:1.6}
+.suspects-info b{font-size:15px;color:var(--navy)}
+.cover{text-align:center;padding:26px 6px}
+.cover .frame{border:10px solid #fff;box-shadow:0 0 0 1px var(--line),0 10px 30px rgba(0,0,0,.15);display:inline-block;margin:18px 0 6px;max-width:80%}
+.cover .frame img{display:block;width:100%}
+@media (max-width:480px){h1{font-size:25px}.teams{grid-template-columns:repeat(4,1fr)}.digits input{width:54px;height:64px}#brand span{display:none}}
+</style>
+</head>
+<body>
+<div id="secret"></div>
+<div id="top">
+  <div id="brand"><span>DOBBI'S MUSEUM · </span><b>도비의 미술관</b></div>
+  <div id="stat"><div id="keys"></div><div id="hearts"></div><div id="timer">40:00</div><button id="snd" title="소리">🔊</button></div>
+</div>
+<main id="app"></main>
+
+<script>
+/* ================= 데이터 ================= */
+const ROOMS = [
+ {no:1, name:'별빛의 방', title:'별이 빛나는 밤', artist:'빈센트 반 고흐', code:['1889'], key:'자',
+  story:'소용돌이치는 밤하늘이 걸린 방이에요. 카피캣은 이 그림을 바꿔치기하면서 하늘과 마을 곳곳에 손을 댔어요.',
+  qs:[
+   {t:'mc', q:'하늘에 반복되는 선은 어떤 모양인가요?', o:['소용돌이처럼 휘감기는 선','곧게 뻗은 직선','뾰족한 지그재그 선','끊어진 점선'], h:'하늘 한가운데를 손가락으로 따라 그려 보세요.'},
+   {t:'mc', q:'화면에서 가장 크게 위로 솟아오른 형태는 무엇인가요?', o:['사이프러스 나무','교회 첨탑','산봉우리','초승달'], h:'그림 왼쪽 앞을 보세요. 불꽃처럼 생겼어요.'},
+   {t:'mc', q:'이 그림에서 가장 강하게 느껴지는 것은 무엇인가요?', o:['움직임','고요함','딱딱함','멈춰 있음'], h:'붓 자국이 어떻게 흐르고 있는지 보세요.'},
+   {t:'mc', vault:true, file:'고흐는 1889년 프랑스 생레미의 요양원에 머물렀어요. 방 창문 너머로 보이는 새벽 풍경을 여러 번 그렸는데, 이 그림은 창밖 풍경에 기억과 상상을 더해 그린 것으로 알려져 있어요. 그림 속 마을은 창밖에서 실제로 보이지 않았다고 해요.',
+    q:'감정 파일을 읽고, 거짓말을 하는 진술을 고르세요.', o:['“이 그림은 창밖 풍경을 사진처럼 그대로 옮긴 거예요.”','“고흐는 요양원에 머물 때 이 그림을 그렸어요.”','“그림 속 마을에는 상상이 더해졌어요.”','“고흐는 창밖 풍경을 여러 번 그렸어요.”'], h:'감정 파일에 “기억과 상상을 더해”라는 말이 있어요.'}
+  ],
+  feel:'이 밤하늘 아래 서 있다면 어떤 소리가 들릴 것 같나요?',
+  clue:'위작의 빗금 붓 자국이 모두 왼쪽 위에서 오른쪽 아래로(＼) 그어져 있어요. 감정 결과, 범인은 <b>왼손잡이</b>예요!'},
+ {no:2, name:'진주의 방', title:'진주 귀걸이를 한 소녀', artist:'요하네스 페르메이르', code:['1665'], key:'세',
+  story:'어둠 속에서 소녀가 뒤를 돌아보는 방이에요. 카피캣은 소녀의 얼굴과 옷차림을 몰래 바꿔 놓았어요.',
+  qs:[
+   {t:'mc', q:'그림에서 가장 밝게 빛나는 곳은 어디인가요?', o:['소녀의 얼굴과 진주','어두운 배경','옷의 그림자','터번 끝자락'], h:'빛이 가장 많이 닿은 곳을 찾아보세요.'},
+   {t:'mc', q:'빛은 어느 쪽에서 들어오고 있나요?', o:['왼쪽','오른쪽','아래쪽','뒤쪽'], h:'얼굴의 어느 쪽이 더 밝은가요?'},
+   {t:'mc', q:'화가가 배경을 아주 어둡게 칠한 까닭은 무엇일까요?', o:['인물이 돋보이게 하려고','물감이 모자라서','한밤중이라서','벽에 그을음이 묻어서'], h:'어두운 바탕 위에 밝은 것이 있으면 어떻게 보일까요?'},
+   {t:'mc', vault:true, file:'소녀가 두른 파란 터번의 물감은 ‘울트라마린’이에요. 아프가니스탄의 산에서 캐낸 푸른 보석을 곱게 갈아 만들어서, 한때 금만큼이나 비쌌다고 전해져요. 그 보석의 이름은 ‘청금석’이에요.',
+    q:'파란 터번 물감의 원료는 무엇인가요?', o:['청금석','바닷물','블루베리','파란 흙'], h:'감정 파일의 마지막 문장을 보세요.'}
+  ],
+  feel:'소녀가 뒤돌아보며 하려던 말은 무엇이었을까요?',
+  clue:'액자 뒤에서 <b>안경닦이 천</b>이 나왔어요. 범인은 안경을 써요!'},
+ {no:3, name:'파도의 방', title:'가나가와 해변의 큰 파도', artist:'가쓰시카 호쿠사이', code:['1831'], key:'히',
+  story:'집채만 한 파도가 몰아치는 방이에요. 카피캣은 파도 사이에 숨은 것들을 슬쩍 지우고 바꿨어요.',
+  qs:[
+   {t:'mc', q:'그림에서 가장 작게 그려진 산의 이름은 무엇인가요?', o:['후지산','한라산','에베레스트산','백두산'], h:'파도 사이, 저 멀리 하얀 눈을 인 산이 있어요.'},
+   {t:'mc', q:'파도가 산보다 훨씬 커 보이는 까닭은 무엇인가요?', o:['가까운 것은 크게, 먼 것은 작게 그려서','실제로 파도가 산보다 커서','산을 그리다 말아서','종이가 모자라서'], h:'가까이 있는 것과 멀리 있는 것의 크기를 생각해 보세요.'},
+   {t:'mc', q:'그림 속에 배는 모두 몇 척인가요?', o:['3척','2척','4척','1척'], h:'파도 밑과 파도 사이를 꼼꼼히 세어 보세요.'},
+   {t:'in', vault:true, file:'호쿠사이가 만든 판화 시리즈의 이름은 ‘후지산 36경’이에요. 후지산을 서른여섯 가지 모습으로 보여 준다는 뜻이지요. 그런데 인기가 아주 많아서 나중에 그림을 더 만들었고, 실제 작품은 모두 46점이 되었어요.',
+    q:'실제 작품은 시리즈 이름의 숫자보다 몇 점 더 많을까요?', a:['10','10점'], ph:'숫자', h:'46 − 36 = ?'}
+  ],
+  feel:'파도 밑 배에 탄 사람이라면 어떤 기분일까요?',
+  clue:'바닥에서 <b>운동화 발자국</b>이 발견됐어요. 범인은 운동화를 신었어요!'},
+ {no:4, name:'들판의 방', title:'이삭 줍기', artist:'장프랑수아 밀레', code:['1857'], key:'봐',
+  story:'추수가 끝난 들판의 방이에요. 카피캣은 멀리 있는 것과 가까이 있는 것을 모두 건드렸어요.',
+  qs:[
+   {t:'mc', q:'세 여인의 비슷한 자세에서 느껴지는 원리는 무엇인가요?', o:['반복','대칭','비례','점이'], h:'비슷한 모양이 여러 번 나타나요.'},
+   {t:'mc', q:'앞쪽의 여인들과 뒤쪽에 산처럼 쌓인 수확물을 함께 그려서 보여 주는 것은?', o:['가난함과 넉넉함의 대비','계절이 바뀌는 모습','날씨의 변화','햇빛이 비치는 방향'], h:'앞쪽 사람들은 떨어진 것을 줍고, 뒤쪽에는 곡식이 가득해요.'},
+   {t:'mc', q:'‘이삭 줍기’는 무엇을 하는 일인가요?', o:['추수가 끝난 뒤 떨어진 이삭을 줍는 일','씨앗을 심는 일','짚단을 쌓는 일','새를 쫓는 일'], h:'여인들의 손을 보세요. 땅에서 무엇을 줍고 있나요?'},
+   {t:'mc', vault:true, file:'어떤 화가는 밀레를 무척 존경해서, 밀레의 그림을 보며 여러 점을 따라 그렸어요. 이 화가는 생레미의 요양원에 머문 적이 있고, 소용돌이치는 밤하늘 그림으로 유명해요.',
+    q:'밀레를 존경해 그의 그림을 따라 그린 화가는 누구일까요?', o:['빈센트 반 고흐','클로드 모네','구스타프 클림트','앙리 루소'], h:'ROOM 1 별빛의 방 그림을 그린 사람이에요.'}
+  ],
+  feel:'세 여인에게 해 주고 싶은 말은 무엇인가요?',
+  clue:'비행기 표를 확인했더니 <b>관장</b>은 그날 밤 해외 출장 중이었어요.'},
+ {no:5, name:'황금의 방', title:'키스', artist:'구스타프 클림트', code:['1907','1908'], key:'야',
+  story:'온통 황금빛으로 반짝이는 방이에요. 카피캣은 두 사람의 옷 무늬와 구석구석을 바꿔 놓았어요.',
+  qs:[
+   {t:'mc', q:'남자 옷의 무늬는 주로 어떤 모양인가요?', o:['네모(직사각형)','동그라미','별','하트'], h:'왼쪽 사람의 옷을 보세요.'},
+   {t:'mc', q:'여자 옷의 무늬는 주로 어떤 모양인가요?', o:['동그라미와 꽃','네모','줄무늬','체크무늬'], h:'오른쪽 사람의 옷을 보세요.'},
+   {t:'mc', q:'서로 다른 두 무늬가 함께 있어 느껴지는 원리는 무엇인가요?', o:['대비','원근','생략','점이'], h:'각진 모양과 둥근 모양이 맞서 있어요.'},
+   {t:'in', vault:true, file:'클림트의 아버지는 금을 다루는 세공사였어요. 클림트는 어릴 때부터 반짝이는 금을 보며 자랐고, 이 그림에도 물감뿐 아니라 얇게 두드려 편 진짜 ○을 붙였어요.',
+    q:'○에 들어갈 재료는 무엇인가요?', a:['금','금박','황금'], ph:'한 글자', h:'아버지가 다루던 것과 같아요.'}
+  ],
+  feel:'이 그림에 어울리는 음악이나 소리는 무엇일까요?',
+  clue:'CCTV를 확인했더니 <b>경비원</b>은 그 시간 내내 정문에 서 있었어요.'},
+ {no:6, name:'달빛의 방', title:'잠자는 집시', artist:'앙리 루소', code:['1897'], key:'보',
+  story:'달빛 아래 사막에서 집시가 잠든 방이에요. 카피캣은 밤하늘과 사자, 집시의 물건에 손을 댔어요.',
+  qs:[
+   {t:'mc', q:'사자는 무엇을 하고 있나요?', o:['잠든 사람의 냄새를 맡고 있다','먹이를 쫓고 있다','잠을 자고 있다','물을 마시고 있다'], h:'사자의 코가 어디를 향하고 있나요?'},
+   {t:'mc', q:'그림 속 시간대는 언제인가요?', o:['밤','이른 아침','한낮','저녁 노을'], h:'하늘에 무엇이 떠 있나요?'},
+   {t:'mc', q:'이 그림이 꿈처럼 느껴지는 까닭은 무엇일까요?', o:['사나운 사자가 잠든 사람 곁에 고요히 서 있어서','흑백으로만 그려서','사람이 아주 많아서','비가 내리고 있어서'], h:'실제라면 일어나기 어려운 장면이 있어요.'},
+   {t:'in', vault:true, file:'루소는 파리의 세관(통행세를 받는 곳)에서 일하며 틈틈이 그림을 그렸어요. 미술 학교를 다니지 않고 혼자 그림을 익혔지요. 그래서 사람들은 그를 ‘○○○ 루소’라고 불렀어요.',
+    q:'루소의 별명 ‘○○○ 루소’에서 ○○○은 무엇일까요?', a:['세관원'], ph:'세 글자', h:'세관에서 일하는 사람을 뭐라고 부를까요?'}
+  ],
+  feel:'집시는 지금 어떤 꿈을 꾸고 있을까요?',
+  clue:'접속 기록을 보니 <b>큐레이터</b>는 그날 밤 내내 사무실 컴퓨터로 전시 안내 책자를 고치고 있었어요.'},
+ {no:7, name:'먹빛의 방', title:'인왕제색도', artist:'정선', code:['1751'], key:'인',
+  story:'비 갠 뒤의 인왕산이 펼쳐진 방이에요. 카피캣은 먹의 진하기와 글씨, 나무에 손을 댔어요.',
+  qs:[
+   {t:'mc', q:'먹이 가장 진하게 칠해진 부분은 어디인가요?', o:['커다란 바위산','안개','하늘','기와지붕'], h:'그림 위쪽 가운데를 보세요.'},
+   {t:'mc', q:'산허리의 안개는 어떻게 나타냈나요?', o:['칠하지 않고 비워 두거나 옅은 먹으로','흰 물감을 두껍게 칠해서','금박을 붙여서','점을 촘촘히 찍어서'], h:'안개 부분은 종이 색과 비슷해요.'},
+   {t:'mc', q:'그림 이름 속 ‘제색(霽色)’은 무슨 뜻일까요?', o:['비가 갠 뒤의 모습','눈 내리는 모습','해 지는 모습','달 뜬 밤의 모습'], h:'방 이야기 첫 문장에 힌트가 있어요.'},
+   {t:'in', vault:true, file:'정선은 상상 속의 중국 산수 대신, 우리 땅의 실제 경치를 직접 보고 그렸어요. 이렇게 ‘진짜 경치’를 그린 그림을 ○○산수화라고 해요.',
+    q:'○○에 들어갈 말은 무엇일까요?', a:['진경','진경산수화','진경산수'], ph:'두 글자', h:'‘진짜 경치’를 줄여 보세요.'}
+  ],
+  feel:'이 산에 오른다면 무엇을 하고 싶나요?',
+  clue:'위작 액자 모서리에 <b>청소용 걸레의 실밥</b>이 끼어 있었어요. 수상한데요?'},
+ {no:8, name:'서당의 방', title:'서당', artist:'김홍도', code:['18'], codeNote:'이 그림은 연도 대신 ‘몇 세기’로 적혀 있어요. 세기 숫자만 입력하세요.', key:'다',
+  story:'훈장님과 아이들이 모인 서당의 방이에요. 카피캣은 사람과 물건 몇 가지를 몰래 없애고 바꿨어요.',
+  qs:[
+   {t:'mc', q:'가운데 아이는 왜 울고 있을까요?', o:['공부한 것을 못 외워 훈장님께 혼나서','배가 고파서','친구와 싸워서','넘어져서'], h:'훈장님 앞에 있는 아이예요. 옆에 책이 펼쳐져 있어요.'},
+   {t:'mc', q:'다른 학생들의 표정은 어떤가요?', o:['웃음을 참고 있다','함께 울고 있다','화가 나 있다','잠들어 있다'], h:'입 모양을 자세히 보세요.'},
+   {t:'mc', q:'우는 아이가 눈에 잘 띄는 까닭은 무엇일까요?', o:['다른 사람들이 둘러앉아 시선이 모이는 자리에 있어서','가장 크게 그려서','빨간 옷을 입어서','혼자 서 있어서'], h:'사람들이 앉은 모양을 보세요.'},
+   {t:'in', vault:true, file:'김홍도의 풍속화에는 벽이나 가구 같은 배경이 거의 없어요. 대신 보는 사람이 사람들의 ○○과 몸짓에 집중하게 해요. 그래서 그림 속 사람들의 기분이 잘 전해지지요.',
+    q:'○○에 들어갈 말은 무엇일까요?', a:['표정'], ph:'두 글자', h:'얼굴에 드러나는 기분을 뭐라고 할까요?'}
+  ],
+  feel:'우는 아이에게 해 주고 싶은 말은 무엇인가요?',
+  clue:'밤 9시 이후 미술관 안에 남아 있던 사람은 <b>경비원과 청소부</b>뿐이었어요.'}
+];
+const SPOTS = {"1": [[0.9062, 0.1677, 0.0742], [0.5672, 0.7051, 0.0469], [0.4844, 0.1677, 0.043], [0.25, 0.6114, 0.1484]], "2": [[0.6146, 0.5427, 0.0521], [0.5312, 0.2902, 0.1354], [0.3833, 0.5303, 0.0521], [0.625, 0.8355, 0.1771]], "3": [[0.6453, 0.6621, 0.0469], [0.0805, 0.1655, 0.0586], [0.75, 0.6735, 0.0859], [0.6836, 0.4281, 0.0586]], "4": [[0.2266, 0.2557, 0.0742], [0.8828, 0.3079, 0.0352], [0.2344, 0.4906, 0.0469], [0.3922, 0.6681, 0.0469]], "5": [[0.375, 0.1765, 0.0573], [0.5542, 0.7061, 0.05], [0.9458, 0.8951, 0.0469], [0.5208, 0.0644, 0.0625]], "6": [[0.8411, 0.0774, 0.0443], [0.599, 0.4238, 0.0781], [0.9661, 0.8028, 0.0469], [0.7344, 0.8354, 0.0312]], "7": [[0.951, 0.2108, 0.0417], [0.3958, 0.1883, 0.1042], [0.2812, 0.7892, 0.0391], [0.6458, 0.2673, 0.026]], "8": [[0.4896, 0.8526, 0.1198], [0.7135, 0.4867, 0.0677], [0.6719, 0.1261, 0.0573], [0.5177, 0.4813, 0.0625]]};
+const SPOT_NAMES = {
+ 1:['초승달 방향','교회 첨탑','새로 생긴 별','사이프러스 나무 색'],
+ 2:['진주 귀걸이','터번 색','입술 색','옷 색'],
+ 3:['후지산','제목 상자','오른쪽 배 색','하늘의 물보라 점'],
+ 4:['뒤쪽 짚더미','말 탄 감독관','왼쪽 여인 모자 색','가운데 여인 토시 색'],
+ 5:['검은 네모 색','빨간 동그라미 무늬 색','서명','머리의 초록 잎 색'],
+ 6:['달 모양','사자 갈기 색','물병 색','만돌린 구멍 테두리 색'],
+ 7:['오른쪽 위 글씨','바위의 먹 진하기','왼쪽 아래 나무','폭포'],
+ 8:['맨 아래 학생','회초리','훈장 모자 색','바닥의 책']
+};
+const EXAM_FIXED = [
+ {tag:'A', title:'밤을 지새우는 사람들', artist:'에드워드 호퍼', t:'mc', q:'이 가게 안으로 들어가는 문은 어디에 있나요?', o:['그림에서 보이지 않는다','왼쪽 벽 가운데','오른쪽 끝 유리창 옆','가게 앞 인도 쪽'], h:'가게 둘레를 한 바퀴 눈으로 따라가 보세요.'},
+ {tag:'B', title:'캠벨 수프 캔', artist:'앤디 워홀', t:'in', q:'수프 캔 그림은 모두 몇 개인가요?', a:['32','32개'], ph:'숫자', h:'한 줄에 몇 개인지 세고, 줄 수를 곱해 보세요.'},
+ {tag:'C', title:'우는 여인', artist:'파블로 피카소', t:'mc', q:'얼굴을 이렇게 조각조각 그린 까닭은 무엇일까요?', o:['여러 방향에서 본 모습을 한 화면에 담으려고','어린아이가 그려서','물감이 번져서','거울에 비친 모습이라서'], h:'코는 옆에서, 눈은 앞에서 본 것 같지 않나요?'},
+ {tag:'D', title:'골콘다', artist:'르네 마그리트', t:'mc', q:'이 그림에서 가장 크게 느껴지는 원리는 무엇인가요?', o:['반복','대칭','생략','비례'], h:'비슷한 사람이 몇 번 나오나요?'}
+];
+const EXAM_POOL = [
+ {tag:'E', title:'월하정인', artist:'신윤복', t:'mc', q:'그림 속 글귀 ‘月沈沈夜三更(달빛 침침한 한밤중 삼경)’이 알려 주는 시간은?', o:['한밤중','해 뜰 무렵','한낮','해 질 무렵'], h:'‘삼경’은 밤 11시~새벽 1시쯤이에요.'},
+ {tag:'F', title:'양산을 든 여인', artist:'클로드 모네', t:'in', q:'그림 속 사람은 모두 몇 명인가요?', a:['2','2명','두명','두 명'], ph:'숫자', h:'언덕 아래쪽도 보세요.'},
+ {tag:'G', title:'빨래터', artist:'박수근', t:'mc', q:'그림 표면은 어떤 느낌인가요?', o:['돌처럼 거칠거칠하다','유리처럼 매끈하다','물처럼 투명하다','털처럼 보드랍다'], h:'가까이 다가가 물감 표면을 보세요.'},
+ {tag:'H', title:'구성 8', artist:'바실리 칸딘스키', t:'mc', q:'이 그림에 없는 것은 무엇인가요?', o:['사람','동그라미','삼각형','직선'], h:'알아볼 수 있는 사물이 있나요?'},
+ {tag:'I', title:'파적도', artist:'김득신', t:'mc', q:'고양이가 물고 달아나는 것은 무엇인가요?', o:['병아리','생선','쥐','담뱃대'], h:'어미 닭이 날개를 퍼덕이며 쫓아가요.'},
+ {tag:'J', title:'초충도 (수박과 들쥐)', artist:'신사임당', t:'mc', q:'수박을 갉아 먹고 있는 동물은 무엇인가요?', o:['들쥐','토끼','다람쥐','고양이'], h:'수박 아래쪽을 보세요.'}
+];
+const EXAM_MATH = {tag:'금고', title:'감정단의 수학 금고', artist:'활동지 문 암호', t:'in', math:true, q:'활동지에 적은 문 암호로 계산하세요.<br>‘별이 빛나는 밤’의 문 암호 − ‘인왕제색도’의 문 암호 = ?', a:['138'], ph:'숫자', h:'ROOM 1과 ROOM 7의 문 암호를 찾아 빼 보세요.'};
+const SUSPECTS = [
+ {n:'관장', r:'미술관 대표', d:'오른손잡이 · 안경 씀 · 구두'},
+ {n:'큐레이터', r:'전시 기획', d:'왼손잡이 · 안경 씀 · 구두'},
+ {n:'경비원', r:'밤 근무', d:'왼손잡이 · 안경 안 씀 · 운동화'},
+ {n:'청소부', r:'청소 담당', d:'왼손잡이 · 안경 씀 · 운동화'}
+];
+const CULPRIT = '청소부';
+const ANSWER = '자세히봐야보인다';
+const DECOYS = ['진','짜','그','림'];
+const PENALTY = 30;
+
+/* ================= 상태 ================= */
+const SKEY = 'dobbiMuseum_v1';
+const DEF_SET = {limit:40, lives:3, over:'room', door:true, sound:true, shuffle:true};
+let S = load();
+function fresh(){ return {team:0, startAt:0, penalty:0, hints:0, lost:0, done:[], cur:null, final:null, finishedAt:0, set:Object.assign({},DEF_SET, S && S.set ? S.set : {})}; }
+function load(){ try{ const s = JSON.parse(localStorage.getItem(SKEY)); if(s && s.set) return s; }catch(e){} return null; }
+function save(){ try{ localStorage.setItem(SKEY, JSON.stringify(S)); }catch(e){} }
+if(!S) S = fresh();
+
+/* 모둠별 고정 난수 */
+function rng(seed){ let x = seed*9301+49297; return ()=>{ x = (x*9301+49297)%233280; return x/233280; }; }
+function shuffled(arr, seed){ const a = arr.slice(); if(!S.set.shuffle) return a; const r = rng(seed); for(let i=a.length-1;i>0;i--){ const j=Math.floor(r()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }
+function roomOrder(){ const t = S.team || 1; return Array.from({length:8},(_,i)=>((t-1+i)%8)+1); }
+function nextRoom(){ return roomOrder().find(n=>!S.done.includes(n)); }
+
+/* ================= 소리 ================= */
+let AC = null;
+function beep(type){
+  if(!S.set.sound) return;
+  try{
+    AC = AC || new (window.AudioContext||window.webkitAudioContext)();
+    const seq = {ok:[[660,.08],[880,.12]], bad:[[220,.18],[160,.22]], key:[[523,.1],[659,.1],[784,.1],[1047,.25]], tap:[[740,.05]], over:[[330,.2],[262,.2],[196,.4]], win:[[523,.12],[659,.12],[784,.12],[1047,.12],[784,.12],[1047,.4]]}[type]||[];
+    let t = AC.currentTime;
+    seq.forEach(([f,d])=>{ const o=AC.createOscillator(), g=AC.createGain(); o.type = type==='bad'||type==='over'?'sawtooth':'triangle'; o.frequency.value=f; g.gain.setValueAtTime(.18,t); g.gain.exponentialRampToValueAtTime(.001,t+d); o.connect(g); g.connect(AC.destination); o.start(t); o.stop(t+d+.02); t+=d; });
+  }catch(e){}
+}
+function vib(ms){ try{ navigator.vibrate && navigator.vibrate(ms); }catch(e){} }
+
+/* ================= 공통 UI ================= */
+const $ = s=>document.querySelector(s);
+const app = $('#app');
+function esc(s){ return String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+function toast(msg){ const t=document.createElement('div'); t.className='toast'; t.textContent=msg; document.body.appendChild(t); setTimeout(()=>t.remove(),2300); }
+function shake(el){ el.classList.remove('shake'); void el.offsetWidth; el.classList.add('shake'); }
+function norm(s){ return String(s).replace(/\s+/g,'').toLowerCase(); }
+
+function elapsed(){ if(!S.startAt) return 0; const end = S.finishedAt || Date.now(); return Math.floor((end - S.startAt)/1000) + S.penalty; }
+function fmt(sec){ const neg = sec<0; sec=Math.abs(sec); return (neg?'+':'') + String(Math.floor(sec/60)).padStart(2,'0')+':'+String(sec%60).padStart(2,'0'); }
+function tick(){
+  const left = S.set.limit*60 - elapsed();
+  const el = $('#timer'); el.textContent = left>=0 ? fmt(left) : fmt(left); el.classList.toggle('over', left<0);
+  const h = $('#hearts');
+  if(S.cur && S.cur.lives!=null && !S.finishedAt){ h.textContent = '♥'.repeat(Math.max(0,S.cur.lives)) + '♡'.repeat(Math.max(0,S.set.lives - S.cur.lives)); } else h.textContent='';
+  const k = $('#keys'); const ord = [1,2,3,4,5,6,7,8];
+  k.innerHTML = S.team ? ord.map(n=>`<span class="${S.done.includes(n)?'on':''}">${S.done.includes(n)?ROOMS[n-1].key:''}</span>`).join('') : '';
+  $('#snd').textContent = S.set.sound ? '🔊' : '🔇';
+}
+setInterval(tick, 1000);
+$('#snd').onclick = ()=>{ S.set.sound=!S.set.sound; save(); tick(); };
+
+function addPenalty(){ S.penalty += PENALTY; S.hints++; save(); tick(); toast(`단서 사용 · ${PENALTY}초 추가`); }
+
+function loseLife(onGameOver){
+  S.cur.lives--; S.lost++; save(); tick(); beep('bad'); vib(200);
+  if(S.cur.lives<=0){ beep('over'); setTimeout(()=>gameOver(), 450); return true; }
+  return false;
+}
+function gameOver(){
+  const m = document.createElement('div'); m.className='modal';
+  const toStart = S.set.over==='game';
+  m.innerHTML = `<div class="card" style="text-align:center"><div class="stamp">GAME OVER</div><h2 style="margin-top:14px">목숨을 모두 잃었어요</h2><p class="lead">${toStart?'카피캣의 함정에 걸렸어요! <b>게임 맨 처음</b>부터 다시 시작해요. (시간은 계속 흘러요)':'카피캣의 함정에 걸렸어요! <b>이 방의 처음</b>부터 다시 시작해요. 모은 열쇠 글자는 그대로예요.'}</p><button class="btn red">다시 도전</button></div>`;
+  document.body.appendChild(m);
+  m.querySelector('button').onclick = ()=>{
+    m.remove();
+    if(toStart){ S.done=[]; S.cur=null; S.final=null; }
+    else if(S.cur && S.cur.final){ S.cur.lives=S.set.lives; }
+    else if(S.cur){ S.cur = {room:S.cur.room, step:'story', lives:S.set.lives}; }
+    save(); render();
+  };
+}
+
+/* ================= 화면 ================= */
+function render(){
+  tick();
+  if(!S.team || !S.startAt) return renderIntro();
+  if(S.finishedAt) return renderCert();
+  if(S.final) return renderFinal();
+  if(!S.cur){ const n = nextRoom(); if(!n){ startFinal(); return renderFinal(); } return renderMap(); }
+  return renderRoom();
+}
+
+let introStep = 0;
+function renderIntro(){
+  if(introStep===0){
+    app.innerHTML = `<div class="card cover">
+      <div class="eyebrow">명화 감상 방탈출 · 시즌 2</div>
+      <h1 class="serif" style="margin-top:10px">도비의 미술관</h1>
+      <div style="font-size:20px;color:var(--red);font-weight:900;margin-top:4px">가짜를 찾아라</div>
+      <div class="frame"><img src="img/r2_fake.jpg" alt=""></div>
+      <p class="lead muted" style="font-size:15px">어딘가 이상한 그림…</p>
+      <button class="btn red" id="go">사건 파일 열기</button></div>`;
+    $('#go').onclick = ()=>{ beep('tap'); introStep=1; renderIntro(); };
+  } else if(introStep===1){
+    app.innerHTML = `<div class="card">
+      <span class="stamp">CASE FILE</span>
+      <h2 class="serif" style="margin-top:14px">개막 하루 전날 밤, 사건이 일어났다</h2>
+      <p class="lead">도비의 미술관 대전시회가 내일 문을 열어요. 그런데 밤사이 위조범 <b style="color:var(--red)">‘카피캣’</b>이 대표 작품 8점을 감쪽같은 가짜로 바꿔 놓았어요!</p>
+      <p class="lead">미술관은 급히 <b>어린이 감정단</b>을 불렀어요. 진품을 모두 되찾고, 카피캣의 정체를 밝혀 주세요.</p>
+      <div class="file" style="margin-top:22px">
+        ① 태블릿이 알려 주는 방의 그림을 교실에서 찾아가요.<br>
+        ② 작품 정보 속 <b>제작 연도</b>가 문 암호예요. 활동지에 꼭 적어 두세요!<br>
+        ③ 가짜 그림에서 진품과 <b>다른 곳 4곳</b>을 찾아 터치해요.<br>
+        ④ 미션과 두뇌 금고를 풀면 <b style="color:var(--red)">열쇠 글자</b>와 <b>범인 단서</b>를 얻어요.<br>
+        ⑤ 방마다 목숨 ${S.set.lives}개! 막히면 단서를 쓸 수 있지만 ${PENALTY}초가 더해져요.
+      </div>
+      <button class="btn" id="go">우리 모둠 고르기</button></div>`;
+    $('#go').onclick = ()=>{ beep('tap'); introStep=2; renderIntro(); };
+  } else {
+    let sel = S.team||0;
+    app.innerHTML = `<div class="card">
+      <div class="eyebrow">어린이 감정단</div>
+      <h2 style="margin-top:6px">우리 모둠 번호를 고르세요</h2>
+      <p class="lead muted" style="font-size:15px">모둠마다 출발하는 방이 달라요. 한 번 고르면 바꿀 수 없어요.</p>
+      <div class="teams">${[1,2,3,4,5,6,7,8].map(n=>`<button data-n="${n}" class="${n===sel?'sel':''}">${n}</button>`).join('')}</div>
+      <button class="btn red" id="go" ${sel?'':'disabled'}>감정 시작! (타이머 ${S.set.limit}분)</button></div>`;
+    app.querySelectorAll('.teams button').forEach(b=>b.onclick=()=>{ sel=+b.dataset.n; beep('tap'); app.querySelectorAll('.teams button').forEach(x=>x.classList.toggle('sel',x===b)); $('#go').disabled=false; });
+    $('#go').onclick = ()=>{ if(!sel) return; S.team=sel; S.startAt=Date.now(); save(); beep('key'); render(); };
+  }
+}
+
+function renderMap(){
+  const n = nextRoom(); const ord = roomOrder();
+  app.innerHTML = `<div class="card">
+    <div class="eyebrow">${S.team}모둠 감정단 · 찾은 진품 ${S.done.length} / 8</div>
+    <h2 style="margin-top:6px">${S.done.length? '다음 방으로 이동하세요':'첫 번째 방으로 출발!'}</h2>
+    <div class="map">${ord.map((x,i)=>{ const r=ROOMS[x-1]; const done=S.done.includes(x); return `<div class="${done?'done':''} ${x===n?'next':''}"><small>${i+1}번째 · ROOM ${x}</small><b>${r.name}</b><span>${done?'✔ 진품 회수 · 열쇠 「'+r.key+'」':(x===n?'▶ 지금 갈 방':'잠김')}</span></div>`; }).join('')}</div>
+    <button class="btn red" id="go">ROOM ${n} · ${ROOMS[n-1].name} 들어가기</button></div>`;
+  $('#go').onclick = ()=>{ beep('tap'); S.cur = {room:n, step:'story', lives:S.set.lives}; save(); render(); };
+}
+
+function stepBar(step){
+  const steps = ['story','door','spot','q','feel','restore'];
+  const idx = steps.indexOf(step);
+  return `<div class="steps">${steps.map((s,i)=>`<i class="${i<idx?'done':(i===idx?'on':'')}"></i>`).join('')}</div>`;
+}
+function roomHead(r, label){
+  return `<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap"><span class="stamp">ROOM ${r.no}</span><span class="eyebrow">${r.name} · ${label}</span></div>`;
+}
+
+function renderRoom(){
+  const c = S.cur; const r = ROOMS[c.room-1];
+  if(c.step==='door' && !S.set.door){ c.step='spot'; save(); }
+  ({story:roomStory, door:roomDoor, spot:roomSpot, q:roomQ, feel:roomFeel, restore:roomRestore})[c.step](r,c);
+}
+
+function roomStory(r,c){
+  app.innerHTML = `<div class="card">${stepBar('story')}${roomHead(r,'사건 현장')}
+    <h1 class="serif" style="margin-top:14px">${r.name}</h1>
+    <p class="lead">${r.story}</p>
+    <div class="file" style="margin-top:22px">교실에서 <b>‘ROOM ${r.no} · ${r.name}’</b> 표시가 붙은 그림을 찾아가세요.<br>그림 앞에 도착하면 아래 버튼을 눌러요.</div>
+    <button class="btn red" id="go">그림 앞에 도착했어요</button></div>`;
+  $('#go').onclick = ()=>{ beep('tap'); c.step = S.set.door?'door':'spot'; save(); render(); };
+}
+
+function roomDoor(r,c){
+  const len = r.code[0].length;
+  c.h = c.h||0;
+  app.innerHTML = `<div class="card">${stepBar('door')}${roomHead(r,'잠긴 문')}
+    <h2 style="margin-top:14px">🔐 문 암호를 입력하세요</h2>
+    <p class="lead" style="font-size:16px">작품 정보 카드의 <b>제작 연도</b>가 문 암호예요. 활동지에도 적어 두세요!</p>
+    ${r.codeNote?`<div class="hintbox">${r.codeNote}</div>`:''}
+    <div class="digits" id="dg">${Array.from({length:len},(_,i)=>`<input inputmode="numeric" maxlength="1" data-i="${i}">`).join('')}</div>
+    <button class="btn" id="go">문 열기</button>
+    <div class="hint-row"><button id="h1" ${c.h>=1?'disabled':''}>단서 (+${PENALTY}초)</button><button id="h2" ${c.h>=2||c.h<1?'disabled':''}>결정적 단서 (+${PENALTY}초)</button></div>
+    <div id="hb">${c.h>=1?`<div class="hintbox">작품 정보 카드의 ‘제작 연도’ 칸에 적힌 숫자 ${len}자리예요.${len===4?' “~년경”이나 “1907~1908년”처럼 적혀 있으면 앞의 숫자를 쓰세요.':''}</div>`:''}${c.h>=2?`<div class="hintbox">문 암호는 <b>${r.code[0]}</b>예요.</div>`:''}</div></div>`;
+  const ins = [...app.querySelectorAll('.digits input')];
+  ins.forEach((inp,i)=>{
+    inp.oninput = ()=>{ inp.value = inp.value.replace(/\D/g,'').slice(-1); if(inp.value && ins[i+1]) ins[i+1].focus(); if(ins.every(x=>x.value)) $('#go').focus(); };
+    inp.onkeydown = e=>{ if(e.key==='Backspace' && !inp.value && ins[i-1]) ins[i-1].focus(); if(e.key==='Enter') $('#go').click(); };
+  });
+  setTimeout(()=>ins[0].focus(),100);
+  $('#go').onclick = ()=>{
+    const v = ins.map(x=>x.value).join('');
+    if(v.length<len) return toast('숫자를 모두 입력하세요');
+    if(r.code.includes(v)){ beep('key'); toast('🔓 문이 열렸어요!'); c.step='spot'; c.h=0; save(); setTimeout(render,500); }
+    else { shake($('#dg')); ins.forEach(x=>x.value=''); ins[0].focus(); if(!loseLife()) toast('암호가 틀렸어요'); }
+  };
+  $('#h1').onclick = ()=>{ c.h=1; addPenalty(); save(); roomDoor(r,c); };
+  $('#h2').onclick = ()=>{ c.h=2; addPenalty(); save(); roomDoor(r,c); };
+}
+
+function roomSpot(r,c){
+  c.found = c.found||[]; c.sh = c.sh||0;
+  const spots = SPOTS[r.no];
+  app.innerHTML = `<div class="card">${stepBar('spot')}${roomHead(r,'위작 감정')}
+    <h2 style="margin-top:14px">진품과 다른 곳 4곳을 찾아 터치하세요</h2>
+    <p class="lead" style="font-size:15px">벽에 걸린 <b>진품</b>과 태블릿의 <b>위작</b>을 꼼꼼히 비교해요. 엉뚱한 곳을 누르면 목숨이 줄어요!</p>
+    <div class="spotwrap" id="sw"><img src="img/r${r.no}_fake.jpg" id="fimg" alt="위작"></div>
+    <div class="found">${spots.map((_,i)=>`<i class="${c.found.includes(i)?'on':''}"></i>`).join('')}<span style="margin-left:6px">${c.found.length} / 4</span></div>
+    <div class="hint-row"><button id="h1">단서: 위치 힌트 (+${PENALTY}초)</button></div>
+    <div id="hb"></div></div>`;
+  const sw = $('#sw'), img = $('#fimg');
+  function draw(){
+    if(!c.found || !document.body.contains(sw)) return;
+    sw.querySelectorAll('.mark').forEach(m=>m.remove());
+    const W = img.clientWidth, H = img.clientHeight;
+    c.found.forEach(i=>{ const [x,y,rr]=spots[i]; const d=Math.max(36, rr*W*2); const m=document.createElement('div'); m.className='mark'; Object.assign(m.style,{left:x*W+'px',top:y*H+'px',width:d+'px',height:d+'px'}); sw.appendChild(m); });
+    if(c.hintSpot!=null && !c.found.includes(c.hintSpot)){ const [x,y,rr]=spots[c.hintSpot]; const d=Math.max(80, rr*W*4); const m=document.createElement('div'); m.className='mark hint'; Object.assign(m.style,{left:x*W+'px',top:y*H+'px',width:d+'px',height:d+'px'}); sw.appendChild(m); }
+  }
+  img.onload = draw; if(img.complete) draw(); window.onresize = draw;
+  let lock = false;
+  sw.onclick = e=>{
+    if(lock) return;
+    const rect = img.getBoundingClientRect(); const px = e.clientX-rect.left, py = e.clientY-rect.top;
+    const W = rect.width, H = rect.height;
+    let hit = -1;
+    spots.forEach(([x,y,rr],i)=>{ const dx=px-x*W, dy=py-y*H; const R=Math.max(26, rr*W*1.25); if(dx*dx+dy*dy<=R*R && hit<0) hit=i; });
+    if(hit>=0){
+      if(c.found.includes(hit)) return;
+      c.found.push(hit); if(c.hintSpot===hit) c.hintSpot=null; save(); beep('ok'); vib(40);
+      roomSpot(r,c);
+      if(c.found.length===4){ lock=true; setTimeout(()=>{ toast('위작 감정 완료!'); c.step='q'; c.qi=0; c.found=null; c.hintSpot=null; save(); render(); }, 900); }
+    } else {
+      const x=document.createElement('div'); x.className='xmark'; x.textContent='✕'; x.style.left=px+'px'; x.style.top=py+'px'; sw.appendChild(x); setTimeout(()=>x.remove(),1000);
+      lock = true; setTimeout(()=>lock=false, 700);
+      loseLife();
+    }
+  };
+  $('#h1').onclick = ()=>{
+    const left = spots.map((_,i)=>i).filter(i=>!c.found.includes(i));
+    if(!left.length) return;
+    c.hintSpot = left[0]; addPenalty(); save(); draw();
+    $('#hb').innerHTML = `<div class="hintbox">노란 점선 근처를 진품과 비교해 보세요. (${SPOT_NAMES[r.no][left[0]]})</div>`;
+  };
+}
+
+function questionList(r){
+  const base = r.qs.filter(q=>!q.vault); const vault = r.qs.filter(q=>q.vault);
+  return shuffled(base, S.team*100 + r.no).concat(vault);
+}
+
+function renderQuestion(q, opts){
+  // opts: {head, seedKey, state, onRight, total, idx}
+  const st = opts.state; st.h = st.h||0; st.gone = st.gone||[];
+  let body = '';
+  if(q.file) body += `<div class="file">${q.file}</div>`;
+  body += `<div class="q">${q.vault?'<span class="stamp gold" style="font-size:11px;margin-right:6px">두뇌 금고</span>':''}${q.q}</div>`;
+  let order = [];
+  if(q.t==='mc'){
+    order = shuffled(q.o.map((_,i)=>i), opts.seed);
+    body += `<div class="opts">${order.map((oi,k)=>`<button data-oi="${oi}" class="${st.gone.includes(oi)?'gone':''}"><b>${'ABCD'[k]}</b><span>${esc(q.o[oi])}</span></button>`).join('')}</div>`;
+  } else {
+    body += `<div class="inp"><input id="ans" placeholder="${q.ph||'정답'}" autocomplete="off"><button id="sub">확인</button></div>`;
+  }
+  const h2txt = q.t==='mc' ? '틀린 보기 2개 지우기' : '정답 보기';
+  body += `<div class="hint-row"><button id="h1" ${st.h>=1?'disabled':''}>단서 (+${PENALTY}초)</button><button id="h2" ${st.h>=2||st.h<1?'disabled':''}>결정적 단서 (+${PENALTY}초)</button></div>`;
+  body += `<div>${st.h>=1?`<div class="hintbox">💡 ${q.h}</div>`:''}${st.h>=2&&q.t==='in'?`<div class="hintbox">🔑 정답은 <b>${q.a[0]}</b>예요.</div>`:''}</div>`;
+  app.innerHTML = `<div class="card">${opts.head}${body}</div>`;
+  const right = ()=>{ beep('ok'); vib(40); st.h=0; st.gone=[]; opts.onRight(); };
+  if(q.t==='mc'){
+    app.querySelectorAll('.opts button').forEach(b=>b.onclick=()=>{
+      const oi = +b.dataset.oi;
+      if(oi===0){ b.classList.add('right'); app.querySelectorAll('.opts button').forEach(x=>x.onclick=null); setTimeout(right, 600); }
+      else { st.gone.push(oi); save(); b.classList.add('gone'); if(!opts.lose()) toast('아니에요! 다시 골라 보세요'); }
+    });
+  } else {
+    const inp = $('#ans');
+    const sub = ()=>{
+      const v = norm(inp.value); if(!v) return;
+      if(q.a.map(norm).includes(v)){ inp.style.borderColor='var(--ok)'; setTimeout(right, 500); }
+      else { shake(inp); inp.value=''; if(!opts.lose()) toast('아니에요! 다시 생각해 보세요'); }
+    };
+    $('#sub').onclick = sub; inp.onkeydown = e=>{ if(e.key==='Enter') sub(); };
+  }
+  $('#h1').onclick = ()=>{ st.h=1; addPenalty(); save(); renderQuestion(q, opts); };
+  $('#h2').onclick = ()=>{ st.h=2; addPenalty(); if(q.t==='mc'){ const wrong=[1,2,3].filter(i=>!st.gone.includes(i)); st.gone.push(...wrong.slice(0, Math.max(0, wrong.length-1)).slice(0,2)); } save(); renderQuestion(q, opts); };
+}
+
+function roomQ(r,c){
+  const list = questionList(r); c.qi = c.qi||0; c.qs = c.qs||{};
+  const q = list[c.qi]; const st = c.qs[c.qi] = c.qs[c.qi]||{};
+  const head = `${stepBar('q')}${roomHead(r, q.vault?'두뇌 금고':'감상 미션 '+(c.qi+1)+' / 3')}`;
+  renderQuestion(q, {head, state:st, seed:S.team*1000 + r.no*10 + c.qi, lose:()=>loseLife(),
+    onRight:()=>{ c.qi++; if(c.qi>=list.length){ c.step='feel'; c.qi=0; c.qs={}; c.feelAt=Date.now(); } save(); render(); }});
+}
+
+function roomFeel(r,c){
+  c.feelAt = c.feelAt||Date.now(); save();
+  app.innerHTML = `<div class="card">${stepBar('feel')}${roomHead(r,'감상 기록')}
+    <h2 style="margin-top:14px">✍️ 그림 앞에서 잠깐 멈춰요</h2>
+    <p class="lead" style="font-size:16px">진품을 다시 천천히 바라보고, 떠오르는 생각을 활동지 ‘감상’ 칸에 적어요.</p>
+    <div class="feel-q serif">“${r.feel}”</div>
+    <button class="btn" id="go" disabled>활동지에 적었어요</button></div>`;
+  const go = $('#go');
+  const upd = ()=>{ const left = 15 - Math.floor((Date.now()-c.feelAt)/1000); if(left>0){ go.disabled=true; go.textContent=`그림을 바라보는 중… ${left}초`; } else { go.disabled=false; go.textContent='활동지에 적었어요'; clearInterval(iv); } };
+  const iv = setInterval(upd, 250); upd();
+  go.onclick = ()=>{ clearInterval(iv); beep('tap'); c.step='restore'; save(); render(); };
+}
+
+function roomRestore(r,c){
+  app.innerHTML = `<div class="card">${stepBar('restore')}${roomHead(r,'진품 회수')}
+    <h2 style="margin-top:14px">진품을 되찾았어요!</h2>
+    <div class="restore"><img src="img/r${r.no}.jpg" alt=""><img class="top" id="topimg" src="img/r${r.no}_fake.jpg" alt=""></div>
+    <div id="after" style="opacity:0;transition:opacity .6s"></div></div>`;
+  setTimeout(()=>{ $("#topimg").style.opacity=0; }, 500);
+  setTimeout(()=>{
+    beep('key');
+    $('#after').innerHTML = `<div class="keycard"><div class="eyebrow">열쇠 글자 — 활동지 빨간 칸에 적으세요</div><div style="margin-top:10px"><span class="keyletter">${r.key}</span></div></div>
+      <div class="clue">🔎 <b>범인 단서 ${r.no}</b><br>${r.clue}<br><span class="muted" style="font-size:13px">활동지 ‘범인 단서’ 칸에 적고, 추리표에 표시하세요.</span></div>
+      <button class="btn red" id="go">${S.done.length+1>=8?'최후의 문으로':'다음 방으로'}</button>`;
+    $('#after').style.opacity=1;
+    $('#go').onclick = ()=>{ if(!S.done.includes(r.no)) S.done.push(r.no); S.cur=null; save(); render(); };
+  }, 2900);
+}
+
+/* ================= 최후의 문 ================= */
+function startFinal(){
+  const pool = shuffled(EXAM_POOL, S.team*7+3).slice(0,2);
+  const exam = shuffled(EXAM_FIXED.concat(pool), S.team*11+5).concat([EXAM_MATH]);
+  S.final = {stage:'letters', picked:[], exam:exam.map(e=>e.tag), ei:0, es:{}, gone:[]};
+  S.cur = {final:true, lives:S.set.lives};
+  save();
+}
+function examByTag(t){ return t==='금고' ? EXAM_MATH : EXAM_FIXED.concat(EXAM_POOL).find(e=>e.tag===t); }
+
+function renderFinal(){
+  const F = S.final; if(!S.cur) S.cur={final:true, lives:S.set.lives};
+  if(F.stage==='letters') return finalLetters(F);
+  if(F.stage==='exam') return finalExam(F);
+  if(F.stage==='culprit') return finalCulprit(F);
+}
+
+function finalLetters(F){
+  const letters = shuffled(ANSWER.split('').concat(DECOYS), S.team*13+1);
+  app.innerHTML = `<div class="card"><span class="stamp">FINAL · 1단계</span>
+    <h2 class="serif" style="margin-top:14px">최후의 문</h2>
+    <p class="lead" style="font-size:16px">모은 열쇠 글자를 <b>방 번호 순서(1→8)</b>대로 눌러 숨은 문장을 완성하세요. 카피캣이 섞어 둔 가짜 글자 4개에 속지 마세요!</p>
+    <div class="slots">${Array.from({length:8},(_,i)=>`<span>${F.picked[i]!=null?letters[F.picked[i]]:''}</span>`).join('')}</div>
+    <div class="tiles">${letters.map((l,i)=>`<button data-i="${i}" class="${F.picked.includes(i)?'used':''}">${l}</button>`).join('')}</div>
+    <div class="row"><button class="btn ghost" id="undo">한 글자 지우기</button><button class="btn red" id="go">문 열기</button></div>
+    <div class="hint-row"><button id="h1">단서 (+${PENALTY}초)</button></div><div id="hb"></div></div>`;
+  app.querySelectorAll('.tiles button').forEach(b=>b.onclick=()=>{ if(F.picked.length>=8) return; F.picked.push(+b.dataset.i); beep('tap'); save(); finalLetters(F); });
+  $('#undo').onclick = ()=>{ F.picked.pop(); save(); finalLetters(F); };
+  $('#go').onclick = ()=>{
+    const word = F.picked.map(i=>letters[i]).join('');
+    if(word.length<8) return toast('8글자를 모두 채우세요');
+    if(word===ANSWER){ beep('win'); toast('“자세히 봐야 보인다” — 문이 열렸어요!'); F.stage='exam'; S.cur.lives=S.set.lives; save(); setTimeout(render,1200); }
+    else { F.picked=[]; save(); if(!loseLife()) { toast('문장이 맞지 않아요'); finalLetters(F); } }
+  };
+  $('#h1').onclick = ()=>{ addPenalty(); $('#hb').innerHTML = `<div class="hintbox">ROOM 1의 열쇠는 「자」, ROOM 8의 열쇠는 「다」예요. 문장 뜻: “○○○ 봐야 보인다”</div>`; };
+}
+
+function finalExam(F){
+  const tag = F.exam[F.ei]; const q = examByTag(tag);
+  const st = F.es[F.ei] = F.es[F.ei]||{};
+  const head = `<span class="stamp">FINAL · 2단계</span><div class="eyebrow" style="margin-top:12px">최종 감정 시험 ${F.ei+1} / ${F.exam.length}</div>
+    ${q.math?'':`<div class="file loc" style="margin-top:16px">교실에서 <b>‘감정 시험 ${q.tag}’</b> 그림을 찾아가세요.<br><span class="muted">${q.title} · ${q.artist}</span></div>`}`;
+  renderQuestion(q, {head, state:st, seed:S.team*500+F.ei, lose:()=>loseLife(), onRight:()=>{ F.ei++; if(F.ei>=F.exam.length){ F.stage='culprit'; } save(); render(); }});
+}
+
+function finalCulprit(F){
+  F.gone = F.gone||[];
+  const got = S.done.slice().sort((a,b)=>a-b);
+  app.innerHTML = `<div class="card"><span class="stamp">FINAL · 3단계</span>
+    <h2 class="serif" style="margin-top:14px">카피캣의 정체는?</h2>
+    <p class="lead" style="font-size:16px">활동지의 용의자 추리표를 보고 범인을 지목하세요. 기회는 단 한 번… 아니, 목숨만큼!</p>
+    <div class="sus">${SUSPECTS.map(s=>`<button data-n="${s.n}" class="${F.gone.includes(s.n)?'gone':''}"><b>${s.n}</b><span>${s.r}<br>${s.d}</span></button>`).join('')}</div>
+    <details style="margin-top:14px"><summary style="font-weight:700;color:var(--navy);cursor:pointer">모은 범인 단서 다시 보기</summary><div class="cluelist">${got.map(n=>`<div><b>단서 ${n}</b> · ${ROOMS[n-1].clue}</div>`).join('')}</div></details></div>`;
+  app.querySelectorAll('.sus button').forEach(b=>b.onclick=()=>{
+    const n = b.dataset.n;
+    if(n===CULPRIT){ beep('win'); S.finishedAt = Date.now(); save(); setTimeout(render, 300); }
+    else { F.gone.push(n); save(); if(!loseLife()){ toast(`${n}은(는) 범인이 아니에요!`); finalCulprit(F); } }
+  });
+}
+
+function renderCert(){
+  const t = elapsed(); const limit = S.set.limit*60;
+  let stars = 3; if(t>limit) stars--; if(S.hints>8) stars--; if(S.lost>8) stars--; stars=Math.max(1,stars);
+  const grade = ['','견습 감정사','정식 감정사','명탐정 감정사'][stars];
+  app.innerHTML = `<div class="cert">
+    <div class="eyebrow">CERTIFICATE</div>
+    <h1 class="serif" style="margin-top:8px">위작 감정 인증서</h1>
+    <p class="lead" style="margin-top:14px"><b>${S.team}모둠 어린이 감정단</b>은 도비의 미술관에서 바꿔치기된 명화 8점을 모두 되찾고, 위조범 카피캣의 정체가 <b style="color:var(--red)">청소부</b>였음을 밝혀냈기에 이 인증서를 드립니다.</p>
+    <div class="stars">${'★'.repeat(stars)}${'☆'.repeat(3-stars)}</div>
+    <div style="font-weight:900;color:var(--navy);font-size:20px">${grade}</div>
+    <table><tr><td>탈출 시간</td><td>${fmt(t)}</td></tr><tr><td>단서 사용</td><td>${S.hints}번</td></tr><tr><td>잃은 목숨</td><td>${S.lost}개</td></tr></table>
+    <p class="lead serif" style="margin-top:20px;font-size:19px;color:var(--navy)">“자세히 봐야 보인다”</p>
+    <p class="muted" style="font-size:13px;margin-top:16px">도비의 미술관 관장 · 활동지 ‘탈출 기록’ 칸에 적어 주세요</p></div>`;
+}
+
+/* ================= 선생님 메뉴 ================= */
+let taps = [];
+$('#secret').addEventListener('click', ()=>{
+  const now = Date.now(); taps = taps.filter(t=>now-t<2000); taps.push(now);
+  if(taps.length>=5){ taps=[]; const pw = prompt('선생님 비밀번호'); if(pw==='1004') teacher(); else if(pw) alert('비밀번호가 달라요'); }
+});
+function teacher(){
+  const m = document.createElement('div'); m.className='modal';
+  const set = S.set; let resetArm = false;
+  const answers = ROOMS.map(r=>`<h4>ROOM ${r.no} ${r.name} · 문 암호 ${r.code.join('/')} · 열쇠 「${r.key}」</h4>위작: ${SPOT_NAMES[r.no].join(', ')}<br>${r.qs.map(q=>q.t==='mc'?q.o[0]:q.a[0]).join(' / ')}`).join('')
+    + `<h4>최후의 문</h4>자세히 봐야 보인다 · 범인: 청소부 · 수학 금고: 138<br>${EXAM_FIXED.concat(EXAM_POOL).map(e=>`${e.tag} ${e.title}: ${e.t==='mc'?e.o[0]:e.a[0]}`).join('<br>')}`;
+  m.innerHTML = `<div class="card"><h2>선생님 메뉴</h2>
+    <div class="tset"><span>제한 시간(분)</span><input id="t_lim" type="number" min="10" max="120" value="${set.limit}" style="width:80px"></div>
+    <div class="tset"><span>방마다 목숨</span><select id="t_lv">${[1,2,3,4,5].map(n=>`<option ${n===set.lives?'selected':''}>${n}</option>`).join('')}</select></div>
+    <div class="tset"><span>목숨을 다 잃으면</span><select id="t_ov"><option value="room" ${set.over==='room'?'selected':''}>그 방 처음부터</option><option value="game" ${set.over==='game'?'selected':''}>게임 맨 처음부터</option></select></div>
+    <div class="tset"><span>문 암호 단계</span><select id="t_dr"><option value="1" ${set.door?'selected':''}>켜기</option><option value="0" ${!set.door?'selected':''}>끄기</option></select></div>
+    <div class="tset"><span>모둠별 문제·보기 순서 섞기</span><select id="t_sh"><option value="1" ${set.shuffle?'selected':''}>켜기</option><option value="0" ${!set.shuffle?'selected':''}>끄기</option></select></div>
+    <div class="tset"><span>소리</span><select id="t_sd"><option value="1" ${set.sound?'selected':''}>켜기</option><option value="0" ${!set.sound?'selected':''}>끄기</option></select></div>
+    <button class="tbtn" id="t_skip">현재 단계 건너뛰기 (비상용)</button>
+    <button class="tbtn" id="t_ans">정답표 보기</button><div class="ans" id="ansbox" style="display:none">${answers}</div>
+    <button class="tbtn danger" id="t_reset">태블릿 초기화 (두 번 눌러야 실행)</button>
+    <button class="btn" id="t_close">저장하고 닫기</button></div>`;
+  document.body.appendChild(m);
+  m.querySelector('#t_ans').onclick = ()=>{ const b=m.querySelector('#ansbox'); b.style.display = b.style.display==='none'?'block':'none'; };
+  m.querySelector('#t_skip').onclick = ()=>{ skipStep(); m.remove(); render(); };
+  m.querySelector('#t_reset').onclick = e=>{
+    if(!resetArm){ resetArm=true; e.target.textContent='한 번 더 누르면 모든 기록이 지워져요'; return; }
+    const keep = S.set; S = fresh(); S.set = keep; introStep=0; save(); m.remove(); render();
+  };
+  m.querySelector('#t_close').onclick = ()=>{
+    set.limit = Math.max(5, +m.querySelector('#t_lim').value||40);
+    set.lives = +m.querySelector('#t_lv').value; set.over = m.querySelector('#t_ov').value;
+    set.door = m.querySelector('#t_dr').value==='1'; set.shuffle = m.querySelector('#t_sh').value==='1'; set.sound = m.querySelector('#t_sd').value==='1';
+    if(S.cur && S.cur.lives>set.lives) S.cur.lives=set.lives;
+    save(); m.remove(); render();
+  };
+}
+function skipStep(){
+  if(S.finishedAt || !S.startAt) return;
+  if(S.final){
+    const F=S.final;
+    if(F.stage==='letters') F.stage='exam';
+    else if(F.stage==='exam'){ F.ei++; if(F.ei>=F.exam.length) F.stage='culprit'; }
+    else if(F.stage==='culprit') S.finishedAt=Date.now();
+    save(); return;
+  }
+  if(!S.cur) return;
+  const c=S.cur, order=['story','door','spot','q','feel','restore'];
+  if(c.step==='q'){ const n=ROOMS[c.room-1].qs.length; c.qi=(c.qi||0)+1; if(c.qi<n){ save(); return; } }
+  if(c.step==='restore'){ if(!S.done.includes(c.room)) S.done.push(c.room); S.cur=null; save(); return; }
+  c.step = order[order.indexOf(c.step)+1]; c.qi=0; c.qs={}; c.found=null; c.h=0; if(c.step==='feel') c.feelAt=Date.now();
+  save();
+}
+
+render();
+</script>
+</body>
+</html>
