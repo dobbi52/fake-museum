@@ -25,6 +25,14 @@ input{font-family:inherit}
 #timer.over{color:#ff8a80}
 #hearts{font-size:18px;letter-spacing:2px;color:#ff8a80;min-width:20px}
 #snd{background:transparent;color:#fff;font-size:18px;opacity:.8}
+#home{background:rgba(255,255,255,.12);color:#fff;font-size:13px;font-weight:700;padding:5px 10px;border-radius:16px;white-space:nowrap}
+.dl{margin-top:26px;border-top:1px dashed var(--line);padding-top:18px;text-align:left}
+.dl .eyebrow{text-align:center}
+.dl a{display:flex;align-items:center;gap:12px;background:#fff;border:1.5px solid var(--line);border-radius:12px;padding:12px 14px;margin-top:10px;text-decoration:none;color:var(--ink)}
+.dl a b{display:block;color:var(--navy);font-size:16px}
+.dl a span{font-size:13px;color:var(--mute)}
+.dl a i{font-style:normal;font-size:24px}
+@media (max-width:480px){#home{font-size:0;padding:5px 9px}#home:before{content:'⌂';font-size:15px}}
 #keys{display:flex;gap:4px}
 #keys span{width:22px;height:22px;border:1.5px solid rgba(255,255,255,.5);border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700}
 #keys span.on{background:#fff;color:var(--red);border-color:#fff}
@@ -140,7 +148,7 @@ p.lead{font-size:17px;line-height:1.75;word-break:keep-all;margin-top:12px}
 <div id="secret"></div>
 <div id="top">
   <div id="brand"><span>DOBBI'S MUSEUM · </span><b>도비의 미술관</b></div>
-  <div id="stat"><div id="keys"></div><div id="hearts"></div><div id="timer">40:00</div><button id="snd" title="소리">🔊</button></div>
+  <div id="stat"><button id="home" title="처음으로">⌂ 처음으로</button><div id="keys"></div><div id="hearts"></div><div id="timer">40:00</div><button id="snd" title="소리">🔊</button></div>
 </div>
 <main id="app"></main>
 
@@ -319,9 +327,18 @@ function tick(){
   const k = $('#keys'); const ord = [1,2,3,4,5,6,7,8];
   k.innerHTML = S.team ? ord.map(n=>`<span class="${S.done.includes(n)?'on':''}">${S.done.includes(n)?ROOMS[n-1].key:''}</span>`).join('') : '';
   $('#snd').textContent = S.set.sound ? '🔊' : '🔇';
+  $('#home').style.display = (S.startAt || introStep>0) ? '' : 'none';
 }
 setInterval(tick, 1000);
 $('#snd').onclick = ()=>{ S.set.sound=!S.set.sound; save(); tick(); };
+$('#home').onclick = ()=>{
+  if(!S.startAt){ introStep=0; render(); return; }
+  const m = document.createElement('div'); m.className='modal';
+  m.innerHTML = `<div class="card" style="text-align:center"><div class="stamp">포기하기</div><h2 style="margin-top:14px">첫 화면으로 돌아갈까요?</h2><p class="lead">지금까지 모은 열쇠 글자, 단서, 시간 기록이 <b>모두 지워지고</b> 모둠 고르기부터 다시 시작해요.</p><div class="row"><button class="btn ghost" id="m_no">계속하기</button><button class="btn red" id="m_yes">처음으로</button></div></div>`;
+  document.body.appendChild(m);
+  m.querySelector('#m_no').onclick = ()=>m.remove();
+  m.querySelector('#m_yes').onclick = ()=>{ const keep=S.set; S=fresh(); S.set=keep; introStep=0; save(); m.remove(); window.scrollTo(0,0); render(); };
+};
 
 function addPenalty(){ S.penalty += PENALTY; S.hints++; save(); tick(); toast(`단서 사용 · ${PENALTY}초 추가`); }
 
@@ -363,7 +380,11 @@ function renderIntro(){
       <div style="font-size:20px;color:var(--red);font-weight:900;margin-top:4px">가짜를 찾아라</div>
       <div class="frame"><img src="img/r2_fake.jpg" alt=""></div>
       <p class="lead muted" style="font-size:15px">어딘가 이상한 그림…</p>
-      <button class="btn red" id="go">사건 파일 열기</button></div>`;
+      <button class="btn red" id="go">사건 파일 열기</button>
+      <div class="dl"><div class="eyebrow">선생님 준비물 내려받기</div>
+        <a href="files/artworks.pdf" download="도비의미술관_작품정보.pdf" target="_blank"><i>🖼️</i><div><b>작품 정보 (PDF · 18쪽)</b><span>A4 가로 · 방 그림 8점 + 감정 시험 그림 10점, 교실 벽에 붙여요</span></div></a>
+        <a href="files/worksheet.pdf" download="도비의미술관_활동지.pdf" target="_blank"><i>📝</i><div><b>활동지 (PDF · 3쪽)</b><span>A4 세로 · 흑백 인쇄용, 모둠마다 한 부씩</span></div></a>
+      </div></div>`;
     $('#go').onclick = ()=>{ beep('tap'); introStep=1; renderIntro(); };
   } else if(introStep===1){
     app.innerHTML = `<div class="card">
