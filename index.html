@@ -165,9 +165,9 @@ details summary{font-weight:700;color:var(--gold);cursor:pointer}
 .cover .lamp{width:120px;height:10px;margin:0 auto;background:linear-gradient(#3a3a3a,#141414);border-radius:0 0 8px 8px}
 .cover h1{font-size:38px;margin-top:10px;letter-spacing:.05em}
 .cover .sub{color:#e0a86b;font-size:16px;letter-spacing:.35em;margin-top:6px;font-weight:700}
-.cover .goldframe{display:inline-block;max-width:250px;margin-top:26px}
+.cover .goldframe{display:inline-block;width:min(440px,82vw);margin-top:26px}
 .cover .goldframe img{display:block;width:100%}
-.ticket{display:flex;margin:26px auto 0;max-width:420px;background:#f1e7cc;color:#2a2112;border-radius:6px;overflow:hidden;box-shadow:0 10px 24px rgba(0,0,0,.5);position:relative;text-align:left;cursor:pointer;width:100%;font-family:inherit;padding:0}
+.ticket{display:flex;margin:26px auto 0;max-width:460px;background:#f1e7cc;color:#2a2112;border-radius:6px;overflow:hidden;box-shadow:0 10px 24px rgba(0,0,0,.5);position:relative;text-align:left;cursor:pointer;width:100%;font-family:inherit;padding:0}
 .ticket .l{flex:1;padding:14px 18px;border-right:2px dashed #b8a67a}
 .ticket .l small{font-size:9.5px;letter-spacing:.25em;color:#8a7546;display:block}
 .ticket .l b{display:block;font-family:'Noto Serif KR',serif;font-size:20px;margin-top:3px;color:#1d1508}
@@ -428,10 +428,7 @@ function renderIntro(){
       <div class="goldframe"><div class="mat"><img src="img/r2_fake.jpg" alt=""></div></div>
       <div class="plaque"><b>어딘가 이상한 그림</b>작가 미상 · 개막 전날 밤 발견</div>
       <button class="ticket" id="go"><div class="l"><small>ADMIT ONE · 어린이 감정단</small><b>대전시회 입장권</b><span>개막 전날 밤 · 위작 감정 특별 입장</span></div><div class="r">입장<br>하기</div></button>
-      <div class="dl"><div class="eyebrow">선생님 준비물 내려받기</div>
-        <a href="files/artworks.pdf" download="도비의미술관_작품정보.pdf" target="_blank"><i>🖼️</i><div><b>작품 정보 (PDF · 18쪽)</b><span>A4 세로 · 방 그림 8점 + 감정 시험 그림 10점, 교실 벽에 붙여요</span></div></a>
-        <a href="files/worksheet.pdf" download="도비의미술관_활동지.pdf" target="_blank"><i>📝</i><div><b>활동지 (PDF · 3쪽)</b><span>A4 세로 · 흑백 인쇄용, 모둠마다 한 부씩</span></div></a>
-      </div></div>`;
+</div>`;
     $('#go').onclick = ()=>{ beep('tap'); introStep=1; renderIntro(); };
   } else if(introStep===1){
     app.innerHTML = `<div class="card">
