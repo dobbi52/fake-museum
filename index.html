@@ -187,6 +187,36 @@ details summary{font-weight:700;color:var(--gold);cursor:pointer}
 .roomtitle h1{font-size:34px;margin-top:6px}
 .roomtitle .line{width:40px;height:2px;background:var(--gold);margin:14px auto 0}
 .stampmark{display:inline-block;border:3px solid #c0392b;color:#c0392b;font-weight:900;padding:4px 12px;transform:rotate(-8deg);font-family:'Noto Serif KR',serif;letter-spacing:.1em;background:rgba(255,255,255,.4)}
+
+.op{position:relative;min-height:calc(100vh - 140px);display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;padding:10px 0 30px;user-select:none}
+.op-skip{position:absolute;top:0;right:0;background:transparent;border:1px solid rgba(217,197,143,.45);color:#d9c58f;font-size:13px;padding:6px 12px;border-radius:16px;z-index:2}
+.op-stage{width:100%;max-width:560px;height:min(58vh,560px);position:relative}
+.op-room{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;animation:opIn .9s ease}
+.op-room.dim{filter:brightness(.55)}
+.op-beam{position:absolute;top:-30px;left:50%;width:360px;height:120%;transform:translateX(-50%);background:radial-gradient(ellipse 50% 60% at 50% 0%,rgba(255,236,190,.35),transparent 70%);pointer-events:none}
+.op-art{width:min(340px,64vw);margin:0}
+.op-art img{display:block;width:100%}
+.op-fake{position:absolute;inset:7px;width:calc(100% - 14px)!important;opacity:0;animation:opSwap 1.4s .6s forwards}
+.op-flash{position:absolute;inset:0;background:#fff;opacity:0;animation:opFlash 1s .6s;pointer-events:none}
+.op-thief{position:absolute;bottom:0;width:min(170px,30vw);fill:#050807;filter:drop-shadow(0 0 12px rgba(0,0,0,.9));animation:opWalk 2.6s ease-in-out forwards}
+.op-note{transform:rotate(-6deg);background:#f6efdc;color:#2a1a08;padding:30px 34px;box-shadow:0 14px 30px rgba(0,0,0,.7);animation:opDrop .9s cubic-bezier(.2,1.4,.4,1)}
+.op-note-in{font-family:'Noto Serif KR',serif;font-size:32px;font-weight:900;line-height:1.55;text-align:center}
+.op-note-in span{display:block;font-size:17px;color:#a3291f;margin-top:10px;text-align:right}
+.op-badge{background:linear-gradient(#fbf5e6,#efe3c6);padding:26px 34px;text-align:center;box-shadow:0 0 0 6px #b8913a,0 16px 34px rgba(0,0,0,.6)}
+.op-badge-t{font-family:'Noto Serif KR',serif;font-size:30px;font-weight:900;color:#1d1508;margin-top:8px}
+.op-text{min-height:110px;margin-top:26px;font-size:27px;line-height:1.65;color:#f3e9cf;text-align:center;font-weight:700;word-break:keep-all;padding:0 10px}
+.op-text b{color:#e6cf8f}.op-text b.r{color:#ff8a78}
+.op-dots{display:flex;gap:8px;margin-top:14px}
+.op-dots i{width:9px;height:9px;border-radius:50%;background:rgba(217,197,143,.25)}
+.op-dots i.on{background:#d9b86a}
+.op-hint{margin-top:16px;font-size:14px;color:#b9a66f;opacity:0;transition:opacity .4s}
+.op-hint.on{opacity:1;animation:blink 1.4s infinite}
+@keyframes opIn{from{opacity:0}to{opacity:1}}
+@keyframes opSwap{0%{opacity:0;filter:blur(6px)}100%{opacity:1;filter:none}}
+@keyframes opFlash{0%{opacity:0}15%{opacity:.85}100%{opacity:0}}
+@keyframes opWalk{from{left:-30%}to{left:72%}}
+@keyframes opDrop{from{transform:translateY(-120px) rotate(-20deg);opacity:0}to{transform:rotate(-6deg);opacity:1}}
+@media (max-width:480px){.op-text{font-size:21px}.op-note-in{font-size:22px}}
 @media (max-width:480px){h1{font-size:26px}.cover h1{font-size:32px}.digits input{width:54px;height:66px}#brand span{display:none}#home{font-size:0;padding:5px 9px}#home:before{content:'⌂';font-size:14px}.fgrid .rm b{font-size:12.5px}.fgrid .rm{min-height:66px;padding:6px 5px}}
 </style>
 </head>
@@ -348,9 +378,9 @@ function beep(type){
   if(!S.set.sound) return;
   try{
     AC = AC || new (window.AudioContext||window.webkitAudioContext)();
-    const seq = {ok:[[660,.08],[880,.12]], bad:[[220,.18],[160,.22]], key:[[523,.1],[659,.1],[784,.1],[1047,.25]], tap:[[740,.05]], over:[[330,.2],[262,.2],[196,.4]], win:[[523,.12],[659,.12],[784,.12],[1047,.12],[784,.12],[1047,.4]]}[type]||[];
+    const seq = {ok:[[660,.08],[880,.12]], bad:[[220,.18],[160,.22]], key:[[523,.1],[659,.1],[784,.1],[1047,.25]], tap:[[740,.05]], over:[[330,.2],[262,.2],[196,.4]], win:[[523,.12],[659,.12],[784,.12],[1047,.12],[784,.12],[1047,.4]], step:[[180,.07],[0,.18],[170,.07]], swap:[[880,.06],[660,.06],[440,.06],[330,.2]], note:[[392,.12],[311,.3]], bell:[[659,.15],[784,.15],[988,.35]], type:[[1400,.012]]}[type]||[];
     let t = AC.currentTime;
-    seq.forEach(([f,d])=>{ const o=AC.createOscillator(), g=AC.createGain(); o.type = type==='bad'||type==='over'?'sawtooth':'triangle'; o.frequency.value=f; g.gain.setValueAtTime(.18,t); g.gain.exponentialRampToValueAtTime(.001,t+d); o.connect(g); g.connect(AC.destination); o.start(t); o.stop(t+d+.02); t+=d; });
+    seq.forEach(([f,d])=>{ if(!f){ t+=d; return; } const o=AC.createOscillator(), g=AC.createGain(); o.type = type==='bad'||type==='over'?'sawtooth':'triangle'; o.frequency.value=f; g.gain.setValueAtTime(.18,t); g.gain.exponentialRampToValueAtTime(.001,t+d); o.connect(g); g.connect(AC.destination); o.start(t); o.stop(t+d+.02); t+=d; });
   }catch(e){}
 }
 function vib(ms){ try{ navigator.vibrate && navigator.vibrate(ms); }catch(e){} }
@@ -418,6 +448,45 @@ function render(){
 }
 
 let introStep = 0;
+let opIdx = 0, opTimer = null;
+const OPENING = [
+  {sc:'museum', sfx:null, text:'내일은 <b>도비의 미술관</b>\n대전시회가 열리는 날.'},
+  {sc:'shadow', sfx:'step', text:'그런데 그날 밤…\n누군가 몰래 들어왔다.'},
+  {sc:'swap', sfx:'swap', text:'위조범 <b class="r">‘카피캣’</b>이\n명화 8점을 가짜로 바꿔 놓았다!'},
+  {sc:'note', sfx:'note', text:'전시실 바닥에 쪽지 한 장이\n떨어져 있었다.'},
+  {sc:'call', sfx:'bell', text:'“어린이 감정단 여러분,\n개막 전까지 진품을 되찾아 주세요!”'}
+];
+function opScene(k){
+  if(k==='museum') return `<div class="op-room"><div class="op-beam"></div><div class="goldframe op-art"><div class="mat"><img src="img/r2.jpg" alt=""></div></div></div>`;
+  if(k==='shadow') return `<div class="op-room dim"><div class="op-beam"></div><div class="goldframe op-art"><div class="mat"><img src="img/r2.jpg" alt=""></div></div><svg class="op-thief" viewBox="0 0 60 120" aria-hidden="true"><ellipse cx="30" cy="14" rx="24" ry="5"/><rect x="16" y="2" width="28" height="13" rx="3"/><circle cx="30" cy="24" r="11"/><path d="M12 40 Q30 30 48 40 L54 92 Q30 98 6 92 Z"/><rect x="14" y="88" width="11" height="30" rx="4"/><rect x="35" y="88" width="11" height="30" rx="4"/></svg></div>`;
+  if(k==='swap') return `<div class="op-room"><div class="op-beam"></div><div class="goldframe op-art"><div class="mat" style="position:relative"><img src="img/r2.jpg" alt=""><img class="op-fake" src="img/r2_fake.jpg" alt=""></div></div><div class="op-flash"></div></div>`;
+  if(k==='note') return `<div class="op-room dim"><div class="op-note"><div class="op-note-in">진짜와 가짜를<br>구별할 수 있을까?<br><span>— 카피캣</span></div></div></div>`;
+  return `<div class="op-room"><div class="op-beam"></div><div class="op-badge"><div class="eyebrow" style="color:#8a7546">TO. 어린이 감정단</div><div class="op-badge-t">도비의 미술관 관장</div></div></div>`;
+}
+function renderOpening(){
+  clearInterval(opTimer);
+  const sc = OPENING[opIdx];
+  app.innerHTML = `<div class="op" id="op">
+    <button class="op-skip" id="opskip">건너뛰기 ▸▸</button>
+    <div class="op-stage">${opScene(sc.sc)}</div>
+    <div class="op-text serif" id="optext"></div>
+    <div class="op-dots">${OPENING.map((_,i)=>`<i class="${i===opIdx?'on':''}"></i>`).join('')}</div>
+    <div class="op-hint" id="ophint">화면을 눌러 계속 ▸</div></div>`;
+  if(sc.sfx) setTimeout(()=>beep(sc.sfx), 250);
+  const full = sc.text; const plain = full.replace(/<[^>]+>/g,'');
+  let n = 0; const el = $('#optext');
+  const show = upto => { let out='', cnt=0, i=0; while(i<full.length && cnt<upto){ if(full[i]==='<'){ const j=full.indexOf('>',i); out+=full.slice(i,j+1); i=j+1; continue; } out+= full[i]==='\n'?'<br>':full[i]; cnt++; i++; }
+    const opens=(out.match(/<b[^>]*>/g)||[]).length, closes=(out.match(/<\/b>/g)||[]).length; if(opens>closes) out+='</b>'; el.innerHTML = out; };
+  let done = false;
+  const finish = ()=>{ clearInterval(opTimer); done = true; show(plain.length); $('#ophint').classList.add('on'); };
+  opTimer = setInterval(()=>{ n++; show(n); if(n%3===0) beep('type'); if(n>=plain.length) finish(); }, 55);
+  $('#op').onclick = e=>{
+    if(e.target.id==='opskip') return;
+    if(!done){ finish(); return; }
+    opIdx++; if(opIdx>=OPENING.length){ introStep=1; renderIntro(); } else renderOpening();
+  };
+  $('#opskip').onclick = ()=>{ clearInterval(opTimer); beep('tap'); introStep=1; renderIntro(); };
+}
 function renderIntro(){
   if(introStep===0){
     app.innerHTML = `<div class="card cover">
@@ -429,13 +498,14 @@ function renderIntro(){
       <div class="plaque"><b>어딘가 이상한 그림</b>작가 미상 · 개막 전날 밤 발견</div>
       <button class="ticket" id="go"><div class="l"><small>ADMIT ONE · 어린이 감정단</small><b>대전시회 입장권</b><span>개막 전날 밤 · 위작 감정 특별 입장</span></div><div class="r">입장<br>하기</div></button>
 </div>`;
-    $('#go').onclick = ()=>{ beep('tap'); introStep=1; renderIntro(); };
+    $('#go').onclick = ()=>{ beep('tap'); opIdx=0; introStep=0.5; renderIntro(); };
+  } else if(introStep===0.5){
+    renderOpening();
   } else if(introStep===1){
     app.innerHTML = `<div class="card">
       <span class="stamp">CASE FILE</span>
-      <h2 class="serif" style="margin-top:14px">개막 하루 전날 밤, 사건이 일어났다</h2>
-      <p class="lead">도비의 미술관 대전시회가 내일 문을 열어요. 그런데 밤사이 위조범 <b style="color:var(--red)">‘카피캣’</b>이 대표 작품 8점을 감쪽같은 가짜로 바꿔 놓았어요!</p>
-      <p class="lead">미술관은 급히 <b>어린이 감정단</b>을 불렀어요. 진품을 모두 되찾고, 카피캣의 정체를 밝혀 주세요.</p>
+      <h2 class="serif" style="margin-top:14px">감정단 활동 안내</h2>
+      <p class="lead">진품 8점을 모두 되찾고, 위조범 <b style="color:#ff8a78">카피캣</b>의 정체를 밝혀요!</p>
       <div class="file guide" style="margin-top:24px">
         ① 태블릿이 알려 주는 방의 그림을 교실에서 찾아가요.<br>
         ② 작품 정보 속 <b>제작 연도</b>가 문 암호예요. 활동지에 꼭 적어 두세요!<br>
