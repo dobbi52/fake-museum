@@ -831,12 +831,27 @@ function teacher(){
     <div class="tset"><span>모둠별 문제·보기 순서 섞기</span><select id="t_sh"><option value="1" ${set.shuffle?'selected':''}>켜기</option><option value="0" ${!set.shuffle?'selected':''}>끄기</option></select></div>
     <div class="tset"><span>소리</span><select id="t_sd"><option value="1" ${set.sound?'selected':''}>켜기</option><option value="0" ${!set.sound?'selected':''}>끄기</option></select></div>
     <button class="tbtn" id="t_skip">현재 단계 건너뛰기 (비상용)</button>
+    <div class="tset" style="border:0;padding-bottom:0"><span>미리 해 보기 (선생님 테스트용)</span></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px">
+      <button class="tbtn" style="margin-top:0" data-jump="letters">최후의 문</button>
+      <button class="tbtn" style="margin-top:0" data-jump="exam">감정 시험</button>
+      <button class="tbtn" style="margin-top:0" data-jump="culprit">범인 지목</button>
+    </div>
     <button class="tbtn" id="t_ans">정답표 보기</button><div class="ans" id="ansbox" style="display:none">${answers}</div>
     <button class="tbtn danger" id="t_reset">태블릿 초기화 (두 번 눌러야 실행)</button>
     <button class="btn" id="t_close">저장하고 닫기</button></div>`;
   document.body.appendChild(m);
   m.querySelector('#t_ans').onclick = ()=>{ const b=m.querySelector('#ansbox'); b.style.display = b.style.display==='none'?'block':'none'; };
   m.querySelector('#t_skip').onclick = ()=>{ skipStep(); m.remove(); render(); };
+  m.querySelectorAll('[data-jump]').forEach(b=>b.onclick=()=>{
+    const stage = b.dataset.jump;
+    if(!S.team) S.team = 1;
+    if(!S.startAt) S.startAt = Date.now();
+    S.finishedAt = 0; S.done = [1,2,3,4,5,6,7,8]; S.cur = null;
+    startFinal(); S.final.stage = stage;
+    save(); m.remove(); window.scrollTo(0,0); render();
+    toast('테스트 모드: 끝나면 ‘처음으로’로 기록을 지워 주세요');
+  });
   m.querySelector('#t_reset').onclick = e=>{
     if(!resetArm){ resetArm=true; e.target.textContent='한 번 더 누르면 모든 기록이 지워져요'; return; }
     const keep = S.set; S = fresh(); S.set = keep; introStep=0; save(); m.remove(); render();
