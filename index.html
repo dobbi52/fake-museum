@@ -224,7 +224,7 @@ details summary{font-weight:700;color:var(--gold);cursor:pointer}
 <div id="secret"></div>
 <div id="top">
   <div id="brand"><span>DOBBI'S MUSEUM · </span><b>도비의 미술관</b></div>
-  <div id="stat"><button id="home" title="처음으로">⌂ 처음으로</button><div id="keys"></div><div id="hearts"></div><div id="timer">40:00</div><button id="snd" title="소리">🔊</button></div>
+  <div id="stat"><button id="home" title="처음으로">⌂ 처음으로</button><div id="keys"></div><div id="hearts"></div><div id="timer">⏱ 00:00</div><button id="snd" title="소리">🔊</button></div>
 </div>
 <main id="app"></main>
 
@@ -359,7 +359,7 @@ const PENALTY = 30;
 
 /* ================= 상태 ================= */
 const SKEY = 'dobbiMuseum_v1';
-const DEF_SET = {limit:40, lives:3, over:'room', door:true, sound:true, shuffle:true};
+const DEF_SET = {lives:3, over:'room', door:true, sound:true, shuffle:true};
 let S = load();
 function fresh(){ return {team:0, startAt:0, penalty:0, hints:0, lost:0, done:[], cur:null, final:null, finishedAt:0, set:Object.assign({},DEF_SET, S && S.set ? S.set : {})}; }
 function load(){ try{ const s = JSON.parse(localStorage.getItem(SKEY)); if(s && s.set) return s; }catch(e){} return null; }
@@ -396,8 +396,7 @@ function norm(s){ return String(s).replace(/\s+/g,'').toLowerCase(); }
 function elapsed(){ if(!S.startAt) return 0; const end = S.finishedAt || Date.now(); return Math.floor((end - S.startAt)/1000) + S.penalty; }
 function fmt(sec){ const neg = sec<0; sec=Math.abs(sec); return (neg?'+':'') + String(Math.floor(sec/60)).padStart(2,'0')+':'+String(sec%60).padStart(2,'0'); }
 function tick(){
-  const left = S.set.limit*60 - elapsed();
-  const el = $('#timer'); el.textContent = left>=0 ? fmt(left) : fmt(left); el.classList.toggle('over', left<0);
+  const el = $('#timer'); el.textContent = '⏱ ' + fmt(elapsed());
   const h = $('#hearts');
   if(S.cur && S.cur.lives!=null && !S.finishedAt){ h.textContent = '♥'.repeat(Math.max(0,S.cur.lives)) + '♡'.repeat(Math.max(0,S.set.lives - S.cur.lives)); } else h.textContent='';
   const k = $('#keys'); const ord = [1,2,3,4,5,6,7,8];
@@ -522,7 +521,7 @@ function renderIntro(){
       <h2 style="margin-top:6px">우리 모둠 번호를 고르세요</h2>
       <p class="lead muted" style="font-size:15px">모둠마다 출발하는 방이 달라요. 한 번 고르면 바꿀 수 없어요.</p>
       <div class="teams">${[1,2,3,4,5,6,7,8].map(n=>`<button data-n="${n}" class="${n===sel?'sel':''}">${n}</button>`).join('')}</div>
-      <button class="btn red" id="go" ${sel?'':'disabled'}>감정 시작! (타이머 ${S.set.limit}분)</button></div>`;
+      <button class="btn red" id="go" ${sel?'':'disabled'}>감정 시작!</button></div>`;
     app.querySelectorAll('.teams button').forEach(b=>b.onclick=()=>{ sel=+b.dataset.n; beep('tap'); app.querySelectorAll('.teams button').forEach(x=>x.classList.toggle('sel',x===b)); $('#go').disabled=false; });
     $('#go').onclick = ()=>{ if(!sel) return; S.team=sel; S.startAt=Date.now(); save(); beep('key'); render(); };
   }
@@ -782,8 +781,8 @@ function finalCulprit(F){
 }
 
 function renderCert(){
-  const t = elapsed(); const limit = S.set.limit*60;
-  let stars = 3; if(t>limit) stars--; if(S.hints>8) stars--; if(S.lost>8) stars--; stars=Math.max(1,stars);
+  const t = elapsed();
+  let stars = 3; if(S.hints>5) stars--; if(S.lost>6) stars--; stars=Math.max(1,stars);
   const grade = ['','견습 감정사','정식 감정사','명탐정 감정사'][stars];
   app.innerHTML = `<div class="cert">
     <div class="eyebrow">CERTIFICATE</div>
@@ -808,7 +807,6 @@ function teacher(){
   const answers = ROOMS.map(r=>`<h4>ROOM ${r.no} ${r.name} · 문 암호 ${r.code.join('/')} · 열쇠 「${r.key}」</h4>위작: ${SPOT_NAMES[r.no].join(', ')}<br>${r.qs.map(q=>q.t==='mc'?q.o[0]:q.a[0]).join(' / ')}`).join('')
     + `<h4>최후의 문</h4>자세히 봐야 보인다 · 범인: 청소부 · 수학 금고: 138<br>${EXAM_FIXED.concat(EXAM_POOL).map(e=>`${e.tag} ${e.title}: ${e.t==='mc'?e.o[0]:e.a[0]}`).join('<br>')}`;
   m.innerHTML = `<div class="card"><h2>선생님 메뉴</h2>
-    <div class="tset"><span>제한 시간(분)</span><input id="t_lim" type="number" min="10" max="120" value="${set.limit}" style="width:80px"></div>
     <div class="tset"><span>방마다 목숨</span><select id="t_lv">${[1,2,3,4,5].map(n=>`<option ${n===set.lives?'selected':''}>${n}</option>`).join('')}</select></div>
     <div class="tset"><span>목숨을 다 잃으면</span><select id="t_ov"><option value="room" ${set.over==='room'?'selected':''}>그 방 처음부터</option><option value="game" ${set.over==='game'?'selected':''}>게임 맨 처음부터</option></select></div>
     <div class="tset"><span>문 암호 단계</span><select id="t_dr"><option value="1" ${set.door?'selected':''}>켜기</option><option value="0" ${!set.door?'selected':''}>끄기</option></select></div>
@@ -826,7 +824,6 @@ function teacher(){
     const keep = S.set; S = fresh(); S.set = keep; introStep=0; save(); m.remove(); render();
   };
   m.querySelector('#t_close').onclick = ()=>{
-    set.limit = Math.max(5, +m.querySelector('#t_lim').value||40);
     set.lives = +m.querySelector('#t_lv').value; set.over = m.querySelector('#t_ov').value;
     set.door = m.querySelector('#t_dr').value==='1'; set.shuffle = m.querySelector('#t_sh').value==='1'; set.sound = m.querySelector('#t_sd').value==='1';
     if(S.cur && S.cur.lives>set.lives) S.cur.lives=set.lives;
