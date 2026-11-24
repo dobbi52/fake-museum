@@ -440,14 +440,20 @@ function loseLife(onGameOver){
 function gameOver(){
   const m = document.createElement('div'); m.className='modal';
   const toStart = S.set.over==='game';
-  m.innerHTML = `<div class="card" style="text-align:center"><div class="stamp">GAME OVER</div><h2 style="margin-top:14px">목숨을 모두 잃었어요</h2><p class="lead">${toStart?'카피캣의 함정에 걸렸어요! <b>게임 맨 처음</b>부터 다시 시작해요. (시간은 계속 흘러요)':'카피캣의 함정에 걸렸어요! <b>이 방의 처음</b>부터 다시 시작해요. 모은 열쇠 글자는 그대로예요.'}</p><button class="btn red">다시 도전</button></div>`;
+  const fin = S.cur && S.cur.final && S.final;
+  let msg;
+  if(toStart) msg = '카피캣의 함정에 걸렸어요! <b>게임 맨 처음</b>부터 다시 시작해요. (시간은 계속 흘러요)';
+  else if(fin && S.final.stage==='exam') msg = '감정 실수가 너무 많았어요! <b>감정 시험을 1번 문제부터</b> 다시 봐요. 문제와 순서는 그대로예요.';
+  else if(fin) msg = '하트를 다시 채워 줄게요. 침착하게 이어서 도전해요!';
+  else msg = '카피캣의 함정에 걸렸어요! <b>이 방의 처음</b>부터 다시 시작해요. 모은 열쇠 글자는 그대로예요.';
+  m.innerHTML = `<div class="card" style="text-align:center"><div class="stamp">GAME OVER</div><h2 style="margin-top:14px">목숨을 모두 잃었어요</h2><p class="lead">${msg}</p><button class="btn red">다시 도전</button></div>`;
   document.body.appendChild(m);
   m.querySelector('button').onclick = ()=>{
     m.remove();
     if(toStart){ S.done=[]; S.cur=null; S.final=null; }
-    else if(S.cur && S.cur.final){ S.cur.lives=S.set.lives; }
+    else if(fin){ S.cur.lives=S.set.lives; if(S.final.stage==='exam'){ S.final.ei=0; S.final.es={}; } }
     else if(S.cur){ S.cur = {room:S.cur.room, step:'story', lives:S.set.lives}; }
-    save(); render();
+    save(); window.scrollTo(0,0); render();
   };
 }
 
