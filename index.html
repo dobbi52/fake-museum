@@ -217,6 +217,21 @@ details summary{font-weight:700;color:var(--gold);cursor:pointer}
 @keyframes opWalk{from{left:-30%}to{left:72%}}
 @keyframes opDrop{from{transform:translateY(-120px) rotate(-20deg);opacity:0}to{transform:rotate(-6deg);opacity:1}}
 @media (max-width:480px){.op-text{font-size:21px}.op-note-in{font-size:22px}}
+.howto{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:18px}
+.hw{background:var(--plaque);color:var(--ink);padding:22px 14px 14px;position:relative;box-shadow:0 6px 14px rgba(0,0,0,.35);display:flex;flex-direction:column;gap:10px}
+.hn{position:absolute;top:-10px;left:-8px;width:36px;height:36px;border-radius:50%;background:#8e2b23;color:#f6e7c8;font-family:'Noto Serif KR',serif;font-weight:900;font-size:20px;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 6px rgba(0,0,0,.4)}
+.hv{height:150px;display:flex;align-items:center;justify-content:center;background:#e6dcc2;overflow:hidden;position:relative}
+.hv img{height:100%;width:100%;object-fit:cover}
+.hv.code{gap:6px}.hv.code i{font-style:normal;width:34px;height:44px;background:linear-gradient(#f6eedb,#e3d6b5);border:2px solid #8a7546;display:flex;align-items:center;justify-content:center;font-family:'Noto Serif KR',serif;font-weight:900;font-size:24px;color:#2a1a08}
+.hv.spot em{position:absolute;width:30px;height:30px;border:3px solid #ff5a4a;border-radius:50%;transform:translate(-50%,-50%);box-shadow:0 0 0 2px #fff}
+.hv.key span{width:62px;height:62px;background:linear-gradient(135deg,#f0d688,#b8913a);display:flex;align-items:center;justify-content:center;font-family:'Noto Serif KR',serif;font-weight:900;font-size:36px;color:#5a1a12;box-shadow:0 0 0 3px #f6e7c8,0 0 14px rgba(184,145,58,.6)}
+.ht b{display:block;font-size:22px;color:#1d1508;font-weight:900;word-break:keep-all}
+.ht span{display:block;font-size:16px;color:#6b5a35;line-height:1.5;margin-top:3px;word-break:keep-all}
+.rules2{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:16px}
+.rules2 div{border:1px solid var(--line);background:rgba(241,234,216,.06);padding:10px 6px;text-align:center}
+.rules2 b{display:block;font-size:24px;color:#e6cf8f}
+.rules2 span{display:block;font-size:16px;color:#efe6d2;margin-top:4px;word-break:keep-all}
+@media (max-width:480px){.hv{height:84px}.ht b{font-size:17px}.ht span{font-size:13.5px}.rules2 span{font-size:13px}.rules2 b{font-size:20px}}
 @media (max-width:480px){h1{font-size:26px}.cover h1{font-size:32px}.digits input{width:54px;height:66px}#brand span{display:none}#home{font-size:0;padding:5px 9px}#home:before{content:'⌂';font-size:14px}.fgrid .rm b{font-size:12.5px}.fgrid .rm{min-height:66px;padding:6px 5px}}
 </style>
 </head>
@@ -503,14 +518,17 @@ function renderIntro(){
   } else if(introStep===1){
     app.innerHTML = `<div class="card">
       <span class="stamp">CASE FILE</span>
-      <h2 class="serif" style="margin-top:14px">감정단 활동 안내</h2>
-      <p class="lead">진품 8점을 모두 되찾고, 위조범 <b style="color:#ff8a78">카피캣</b>의 정체를 밝혀요!</p>
-      <div class="file guide" style="margin-top:24px">
-        ① 태블릿이 알려 주는 방의 그림을 교실에서 찾아가요.<br>
-        ② 작품 정보 속 <b>제작 연도</b>가 문 암호예요. 활동지에 꼭 적어 두세요!<br>
-        ③ 가짜 그림에서 진품과 <b>다른 곳 4곳</b>을 찾아 터치해요.<br>
-        ④ 미션과 두뇌 금고를 풀면 <b style="color:var(--red)">열쇠 글자</b>와 <b>범인 단서</b>를 얻어요.<br>
-        ⑤ 방마다 목숨 ${S.set.lives}개! 막히면 단서를 쓸 수 있지만 ${PENALTY}초가 더해져요.
+      <h2 class="serif" style="margin-top:14px">방 하나는 이렇게 풀어요</h2>
+      <div class="howto">
+        <div class="hw"><div class="hn">1</div><div class="hv"><img src="img/r3.jpg" alt=""></div><div class="ht"><b>그림 찾아가기</b><span>태블릿이 알려 준 방의 그림 앞으로!</span></div></div>
+        <div class="hw"><div class="hn">2</div><div class="hv code"><i>1</i><i>8</i><i>8</i><i>9</i></div><div class="ht"><b>문 암호 = 제작 연도</b><span>작품 정보에서 찾아 활동지에 적기</span></div></div>
+        <div class="hw"><div class="hn">3</div><div class="hv spot"><img src="img/r3_fake.jpg" alt=""><em style="left:68%;top:64%"></em><em style="left:50%;top:40%"></em></div><div class="ht"><b>다른 곳 4곳 찾기</b><span>벽의 진짜와 비교해서 터치</span></div></div>
+        <div class="hw"><div class="hn">4</div><div class="hv key"><span>자</span></div><div class="ht"><b>열쇠 글자 받기</b><span>문제를 다 풀면 받아요. 활동지에 적기</span></div></div>
+      </div>
+      <div class="rules2">
+        <div><b style="color:#e8705f">♥♥♥</b><span>방마다 목숨 ${S.set.lives}개</span></div>
+        <div><b>💡</b><span>막히면 단서 (+${PENALTY}초)</span></div>
+        <div><b>✎</b><span>활동지에 꼭 적기</span></div>
       </div>
       <button class="btn" id="go">우리 모둠 고르기</button></div>`;
     $('#go').onclick = ()=>{ beep('tap'); introStep=2; renderIntro(); };
