@@ -232,6 +232,17 @@ details summary{font-weight:700;color:var(--gold);cursor:pointer}
 .rules2 b{display:block;font-size:24px;color:#e6cf8f}
 .rules2 span{display:block;font-size:16px;color:#efe6d2;margin-top:4px;word-break:keep-all}
 @media (max-width:480px){.hv{height:84px}.ht b{font-size:17px}.ht span{font-size:13.5px}.rules2 span{font-size:13px}.rules2 b{font-size:20px}}
+.suspf{background:var(--plaque);color:var(--ink);margin-top:14px;padding:14px 14px 10px;box-shadow:0 6px 14px rgba(0,0,0,.35)}
+.suspf-h{font-weight:900;font-size:17px;color:#1d1508;margin-bottom:8px}
+.suspf table{width:100%;border-collapse:collapse;font-size:16px}
+.suspf th,.suspf td{border-top:1px solid #d6c9a6;padding:8px 6px;text-align:center}
+.suspf th{text-align:left;font-family:'Noto Serif KR',serif;font-size:17px;color:#1d1508;white-space:nowrap}
+.suspf th small{display:block;font-family:'Noto Sans KR',sans-serif;font-size:12px;color:#8a7546;font-weight:400}
+.suspf td.hd{font-size:13px;color:#8a7546;font-weight:700;border-top:0}
+.suspf tr:first-child th{border-top:0}
+.suspf.sm table{font-size:14px}.suspf.sm th{font-size:15px}
+@media (max-width:480px){.suspf table{font-size:13.5px}.suspf th{font-size:15px}.suspf th,.suspf td{padding:7px 3px}}
+@media (max-width:480px){#keys{gap:2px}#keys span{width:15px;height:18px;font-size:10px}#timer{font-size:14px;white-space:nowrap}#stat{gap:6px}#brand b{font-size:13px}#hearts{font-size:13px;letter-spacing:0}#snd{display:none}#top{padding:10px 8px}}
 @media (max-width:480px){h1{font-size:26px}.cover h1{font-size:32px}.digits input{width:54px;height:66px}#brand span{display:none}#home{font-size:0;padding:5px 9px}#home:before{content:'⌂';font-size:14px}.fgrid .rm b{font-size:12.5px}.fgrid .rm{min-height:66px;padding:6px 5px}}
 </style>
 </head>
@@ -368,6 +379,10 @@ const SUSPECTS = [
  {n:'청소부', r:'청소 담당', d:'왼손잡이 · 안경 씀 · 운동화'}
 ];
 const CULPRIT = '청소부';
+function suspectTable(small){
+  const rows = SUSPECTS.map(x=>{ const [hand,glass,shoe]=x.d.split(' · '); return `<tr><th>${x.n}<small>${x.r}</small></th><td>${hand}</td><td>${glass}</td><td>${shoe}</td></tr>`; }).join('');
+  return `<div class="suspf${small?' sm':''}"><div class="suspf-h">🕵️ 용의자 파일</div><table><tr><th></th><td class="hd">손</td><td class="hd">안경</td><td class="hd">신발</td></tr>${rows}</table></div>`;
+}
 const ANSWER = '자세히봐야보인다';
 const DECOYS = ['진','짜','그','림'];
 const PENALTY = 30;
@@ -536,6 +551,9 @@ function renderIntro(){
         <div><b>💡</b><span>막히면 단서 (+${PENALTY}초)</span></div>
         <div><b>✎</b><span>활동지에 꼭 적기</span></div>
       </div>
+      <h2 class="serif" style="margin-top:26px">용의자는 이 4명!</h2>
+      <p class="lead" style="font-size:15px;margin-top:6px">방마다 받는 범인 단서와 비교해 범인이 아닌 사람을 활동지 추리표에서 지워 가요.</p>
+      ${suspectTable(false)}
       <button class="btn" id="go">우리 모둠 고르기</button></div>`;
     $('#go').onclick = ()=>{ beep('tap'); introStep=2; renderIntro(); };
   } else {
@@ -737,7 +755,8 @@ function roomRestore(r,c){
   setTimeout(()=>{
     beep('key');
     $('#after').innerHTML = `<div class="keycard"><div class="eyebrow">열쇠 글자 — 활동지 빨간 칸에 적으세요</div><div style="margin-top:10px"><span class="keyletter">${r.key}</span></div></div>
-      <div class="clue">🔎 <b>범인 단서 ${r.no}</b><br>${r.clue}<br><span class="muted" style="font-size:13px">활동지 ‘범인 단서’ 칸에 적고, 추리표에 표시하세요.</span></div>
+      <div class="clue">🔎 <b>범인 단서 ${r.no}</b><br>${r.clue}<br><span class="muted" style="font-size:13px">활동지 ‘범인 단서’ 칸에 적고, 아래 용의자 파일과 비교해 추리표에 ✕ 하세요.</span></div>
+      ${suspectTable(true)}
       <button class="btn red" id="go">${S.done.length+1>=8?'최후의 문으로':'다음 방으로'}</button>`;
     $('#after').style.opacity=1;
     $('#go').onclick = ()=>{ if(!S.done.includes(r.no)) S.done.push(r.no); S.cur=null; save(); render(); };
